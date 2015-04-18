@@ -12,6 +12,9 @@ def parse_parameters(sparm):
     
     If this function is not implemented, any custom command line
     arguments are ignored and sparm remains unchanged."""
+
+    # TODO
+    # Let user input parameters with command lines
     sparm.arbitrary_parameter = 'I am an arbitrary parameter!'
 
 def parse_parameters_classify(attribute, value):
@@ -50,7 +53,8 @@ def init_model(sample, sm, sparm):
     perspective.  This function returns nothing."""
 
     # TODO
-    sm.size_psi = len(sample[0][0])+1
+    PsiSize = 69 * 48 + 48 * 48
+    sm.size_psi = PsiSize
 
 def init_constraints(sample, sm, sparm):
     """Initializes special constraints.
@@ -107,6 +111,9 @@ def classify_example(x, sm, sparm):
     # Believe it or not, this is a dot product.  The last element of
     # sm.w is assumed to be the weight associated with the bias
     # feature as explained earlier.
+
+    # TODO
+    # Viterbi to get ans.
     return sum([i*j for i,j in zip(x,sm.w[:-1])]) + sm.w[-1]
 
 def find_most_violated_constraint(x, y, sm, sparm):
@@ -180,6 +187,7 @@ def loss(y, ybar, sparm):
     # TODO
     # CostFunction
     cost = EditDistanceCost
+    print 'Cost = ',cost.fn(y, ybar)
     return cost.fn(y, ybar)
 
 def print_iteration_stats(ceps, cached_constraint, sample, sm,
