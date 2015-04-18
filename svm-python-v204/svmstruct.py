@@ -1,6 +1,6 @@
-"""A module that SVM^python interacts with to do its evil bidding."""
+import viterbi  # viterbi(w, X)
+import costfunc # class EditDistanceCost, EditDistanceCost(str1, str2)
 
-# Thomas Finley, tfinley@gmail.com
 
 def parse_parameters(sparm):
     """Sets attributes of sparm based on command line arguments.
@@ -35,11 +35,9 @@ def read_examples(filename, sparm):
     be an object 'e' where e[0] and e[1] is the pattern (x) and label
     (y) respectively.  Specifically, the intention is that the element
     be a two-element tuple containing an x-y pair."""
-    # We're not actually reading a file in this sample binary
-    # classification task, but rather just returning a contrived
-    # problem for learning.  The correct hypothesis would obviously
-    # tend to have a positive weight for the first feature, and a
-    # negative weight for the 4th feature.
+
+    # TODO
+    # return a list contained with tuples (data, label)
     return [([1,1,0,0], 1), ([1,0,1,0], 1), ([0,1,0,1],-1),
             ([0,0,1,1],-1), ([1,0,0,0], 1), ([0,0,0,1],-1)]
 
@@ -50,10 +48,8 @@ def init_model(sample, sm, sparm):
     the number of features.  The ancillary purpose is to add any
     information to sm that is necessary from the user code
     perspective.  This function returns nothing."""
-    # In our binary classification task, we've encoded a pattern as a
-    # list of four features.  We just want a linear rule, so we have a
-    # weight corresponding to each feature.  We also add one to allow
-    # for a last "bias" feature.
+
+    # TODO
     sm.size_psi = len(sample[0][0])+1
 
 def init_constraints(sample, sm, sparm):
@@ -129,6 +125,8 @@ def find_most_violated_constraint(x, y, sm, sparm):
     loss into account at all, but it isn't always a terrible
     approximation.  One still technically maintains the empirical
     risk bound condition, but without any regularization."""
+
+    # TODO
     score = classify_example(x,sm,sparm)
     discy, discny = y*score, -y*score + 1
     if discy > discny: return y
@@ -160,6 +158,8 @@ def psi(x, y, sm, sparm):
     # In the case of binary classification, psi is just the class (+1
     # or -1) times the feature vector for x, including that special
     # constant bias feature we pretend that we have.
+
+    # TODO
     import svmapi
     thePsi = [0.5*y*i for i in x]
     thePsi.append(0.5*y) # Pretend as though x had an 1 at the end.
@@ -177,9 +177,10 @@ def loss(y, ybar, sparm):
 
     The default behavior is to perform 0/1 loss based on the truth of
     y==ybar."""
-    # If they're the same sign, then the loss should be 0.
-    if y*ybar > 0: return 0
-    return 1
+    # TODO
+    # CostFunction
+    cost = EditDistanceCost
+    return cost.fn(y, ybar)
 
 def print_iteration_stats(ceps, cached_constraint, sample, sm,
                           cset, alpha, sparm):
