@@ -1,13 +1,4 @@
 import numpy as np
-seq_length = 5
-dim = 69
-ob = np.random.random((69,48))
-tr = np.random.random((48,48))
-w = []
-w.append(ob)
-w.append(tr)
-
-X = np.random.random((seq_length, dim))
 
 '''
 ob:    48 phone
@@ -52,5 +43,19 @@ def viterbi(w, X):
             path[l] = np.argmax(prob[:,l])
         else:
             path[l] = parent[path[l+1], l+1]
-    print path
-viterbi(w, X)
+    return path
+
+def main():
+    seq_length = 5
+    dim = 69
+    ob = np.random.random((69,48))
+    tr = np.random.random((48,48))
+    w = []
+    w.append(ob)
+    w.append(tr)
+
+    X = np.random.random((seq_length, dim))
+    ybar = viterbi(w, X)
+
+if __name__ == '__main__':
+    main()
