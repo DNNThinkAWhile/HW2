@@ -1,4 +1,8 @@
 """A module that SVM^python interacts with to do its evil bidding."""
+import sys
+sys.path.append('..')
+
+import costfunc
 
 # Thomas Finley, tfinley@gmail.com
 
@@ -177,9 +181,10 @@ def loss(y, ybar, sparm):
 
     The default behavior is to perform 0/1 loss based on the truth of
     y==ybar."""
-    # If they're the same sign, then the loss should be 0.
-    if y*ybar > 0: return 0
-    return 1
+    
+    cost_clz = costfunc.EditDistanceCost
+    cost = cost_clz.fn(y, ybar)
+    return cost
 
 def print_iteration_stats(ceps, cached_constraint, sample, sm,
                           cset, alpha, sparm):

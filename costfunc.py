@@ -68,5 +68,17 @@ def main():
 	cost = cost_clz.fn(str1, str2)
 	print 'EditDistance between "', str1, '" and "', str2, '" is ', cost
 
+	# usage 2
+	l1 = [1,2,3,4,5,6]
+	l2 = [2,4,5,6,7]
+	cost = cost_clz.fn(l1, l2)
+	print 'EditDistance between ', l1, ' and ', l2, ' is ', cost
+
+	# usage 2
+	l1 = [1,2,3]
+	l2 = [1,2]
+	cost = cost_clz.fn(l1, l2)
+	print 'EditDistance between ', l1, ' and ', l2, ' is ', cost
+
 if __name__ == '__main__':
 	main()
