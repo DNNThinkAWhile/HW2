@@ -59,6 +59,7 @@ def viterbi(w, x, y):
 
     for s in range(seq_length):
         p[:,s] = np.sum(np.multiply(np_x[s,:], obT), 1)
+    prob = p
     if not flag:
         prob = np.log(p)
     for l in range(1, seq_length):
