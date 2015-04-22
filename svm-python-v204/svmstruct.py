@@ -1,9 +1,5 @@
-import viterbi
-from viterbi import * # viterbi(w, X)
-import costfunc
-from costfunc import * # class EditDistanceCost, EditDistanceCost(str1, str2)
-import predict
-import random
+import viterbi  # viterbi(w, X)
+import costfunc # class EditDistanceCost, EditDistanceCost(str1, str2)
 import feature_vector
 import sys
 import operator as op
@@ -22,6 +18,8 @@ def parse_parameters(sparm):
     # TODO
     # Let user input parameters with command lines
     sparm.arbitrary_parameter = 'I am an arbitrary parameter!'
+    sparm.d_speechid_index, sparm.d_index_phone, sparm.d_phone_index, sparm.d_phone_alphabet \
+        = feature_vector.read_map('../MLDS_HW1_RELEASE_v1/label/train.lab', '../MLDS_HW1_RELEASE_v1/phones/48_idx_chr.map')
 
 def parse_parameters_classify(attribute, value):
     """Process a single custom command line argument for the classifier.
@@ -123,7 +121,7 @@ def init_constraints(sample, sm, sparm):
     constraints = []
     for i in xrange(len(sample)):
         # Create a sparse vector which selects out a single feature.
-        sparse = svmapi.Sparse(sample[i][1])
+        sparse = svmapi.Sparse([sample[i][1]])
         # The left hand side of the inequality is a document.
         lhs = svmapi.Document([sparse], costfactor=1, slackid=i+1+len(sample))
         # Append the lhs and the rhs (in this case 0).
@@ -139,9 +137,7 @@ def classify_example(x, sm, sparm):
 
     # TODO
     # Viterbi to get ans.
-    print 'classify ans'
-    ans = predict(sm.w, x)
-    return ans
+    return sum([i*j for i,j in zip(x,sm.w[:-1])]) + sm.w[-1]
 
 def find_most_violated_constraint(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
@@ -161,9 +157,10 @@ def find_most_violated_constraint(x, y, sm, sparm):
     risk bound condition, but without any regularization."""
 
     # TODO
-    print 'finding most violated cons. ...'
-    y_bar = viterbi(list(sm.w), x, y)
-    return y_bar
+    score = classify_example(x,sm,sparm)
+    discy, discny = y*score, -y*score + 1
+    if discy > discny: return y
+    return -y
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
@@ -274,6 +271,32 @@ def print_testing_stats(sample, sm, sparm, teststats):
     the teststats object through use of the eval_prediction function.
 
     The default behavior is that nothing is printed."""
+    all_y = []
+    d_index_phone = sparm.d_index_phone
+    d_phone_alphabet = sparm.d_phone_alphabet
+    with open(sparm.argv[4], 'r') as f:
+        ylines = f.readlines()
+        
+    
+    for y in ylines:
+        y_list = y.strip('[]\n').split(',')
+        y_list = map(int, y_list)
+        trim_y_str = ''
+        current_y_idx = 999
+        for y_ele in y_list:
+            if y_ele != current_y_idx:
+                current_y_idx = y_ele
+                trim_y_str += d_phone_alphabet[d_index_phone[y_ele]]
+        trim_y_str.strip('K')
+        all_y.append(trim_y_str)
+        
+    with open(sparm.argv[4], 'w') as f:
+        print >> f,'id,phone_sequence'
+        idx = 0
+        for id in sparm.speech_id:
+            str = id + ',' + all_y[idx]
+            print >> f, str
+            idx += 1
     print teststats
 
 def eval_prediction(exnum, (x, y), ypred, sm, sparm, teststats):
@@ -325,6 +348,8 @@ def write_label(fileptr, y):
     object is a file, not a string.  Attempts to close the file are
     ignored.)  The default behavior is equivalent to
     'print>>fileptr,y'"""
+    
+    
     print>>fileptr,y
 
 def print_help():
