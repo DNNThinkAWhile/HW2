@@ -135,7 +135,8 @@ def classify_example(x, sm, sparm):
 
     # TODO
     # Viterbi to get ans.
-    return sum([i*j for i,j in zip(x,sm.w[:-1])]) + sm.w[-1]
+    ans = viterbi(sm.w, x)
+    return ans
 
 def find_most_violated_constraint(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
@@ -155,10 +156,8 @@ def find_most_violated_constraint(x, y, sm, sparm):
     risk bound condition, but without any regularization."""
 
     # TODO
-    score = classify_example(x,sm,sparm)
-    discy, discny = y*score, -y*score + 1
-    if discy > discny: return y
-    return -y
+    y_bar = viterbi(sm.w, x)
+    return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
@@ -168,7 +167,7 @@ def find_most_violated_constraint_slack(x, y, sm, sparm):
     general find_most_violated_constraint function."""
     return find_most_violated_constraint(x, y, sm, sparm)
 
-def find_most_violated_constraint_margin(x, y, sm, sparm):
+def find_most_violat ed_constraint_margin(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
 
     The find most violated constraint function for margin rescaling.
