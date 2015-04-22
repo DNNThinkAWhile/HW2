@@ -2,6 +2,7 @@ import viterbi
 from viterbi import * # viterbi(w, X)
 import costfunc
 from costfunc import * # class EditDistanceCost, EditDistanceCost(str1, str2)
+import predict
 import random
 import feature_vector 
 import sys
@@ -139,7 +140,7 @@ def classify_example(x, sm, sparm):
     # TODO
     # Viterbi to get ans.
     print 'classify ans'
-    ans = viterbi(sm.w, x, y)
+    ans = predict(sm.w, x)
     return ans
 
 def find_most_violated_constraint(x, y, sm, sparm):
