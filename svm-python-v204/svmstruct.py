@@ -72,7 +72,7 @@ def read_examples(filename, sparm):
                 y = []
 
             x.append(feat)
-            y.append(d_speechid_index[spch_id])
+            y.append(int(d_speechid_index[spch_id]))
 
     print 'read_examples done.'
     return examples
