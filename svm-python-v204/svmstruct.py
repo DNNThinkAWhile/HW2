@@ -2,6 +2,7 @@ import viterbi  # viterbi(w, X)
 import costfunc # class EditDistanceCost, EditDistanceCost(str1, str2)
 import feature_vector
 import sys
+import operator as op
 
 def parse_parameters(sparm):
     """Sets attributes of sparm based on command line arguments.
@@ -199,11 +200,29 @@ def psi(x, y, sm, sparm):
     # or -1) times the feature vector for x, including that special
     # constant bias feature we pretend that we have.
 
-    # TODO
     import svmapi
-    thePsi = [0.5*y*i for i in x]
-    thePsi.append(0.5*y) # Pretend as though x had an 1 at the end.
+
+    # x: list of lists of floats,
+    #    i.e. a list of samples, each sample containing 69 fbank floats
+    # y: list of int,  they are phoneme indices
+
+    # because the returned value is Sparse which eats list,
+    # we(tang) use list instead of np.array
+    observation = [0] * (69 * 48)
+    transition = [0] * (48 * 48)
+    for idx, (xi, yi) in enumerate(zip(x, y)):
+        st =  yi * 69
+        end = st + 69
+        observation[st:end] = map(op.add, observation[st:end], xi)
+        if idx > 0:
+            transition[prev_yi * 48 + yi] += 1.0
+        prev_yi = yi
+
+    thePsi = observation
+    thePsi.extend(transition)
+
     return svmapi.Sparse(thePsi)
+
 
 def loss(y, ybar, sparm):
     """Return the loss of ybar relative to the true labeling y.
