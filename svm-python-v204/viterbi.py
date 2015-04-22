@@ -35,16 +35,20 @@ def err(y, l, prob, tmp_next, parent):
     return cost
 
 def viterbi(w, x, y):
-    
+    w = np.asarray(w)
+    flag = 0
+    if not np.any(w):
+        flag = 1
     # observation matrix
-    ob = np.asarray(w[0:69*48]) 
+    ob = w[0:69*48] 
     ob = np.reshape(ob,(69,48))
     obT = ob.transpose()
     
     # transition matrix
-    tr = np.asarray(w[69*48:69*48+48*48])
+    tr = w[69*48:69*48+48*48]
     tr = np.reshape(tr,(48,48))
-    tr = np.log(tr)
+    if not flag:
+        tr = np.log(tr)
 
     # x
     np_x = np.asarray(x)
@@ -55,7 +59,8 @@ def viterbi(w, x, y):
 
     for s in range(seq_length):
         p[:,s] = np.sum(np.multiply(np_x[s,:], obT), 1)
-    prob = np.log(p)
+    if not flag:
+        prob = np.log(p)
     for l in range(1, seq_length):
         tmp_prob = np.tile(prob[:,l-1].reshape(48,1), 48) + tr
         tmp_next = np.argmax(tmp_prob, 0)
