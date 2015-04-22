@@ -49,7 +49,7 @@ def viterbi(w, x, y):
     # x
     np_x = np.asarray(x)
 
-    seq_length, dim = x.shape
+    seq_length, dim = np_x.shape
     p = np.zeros((48, seq_length)) # propability along the path
     parent = np.ones((48, seq_length))*(-1) # parent for back tracing
 
