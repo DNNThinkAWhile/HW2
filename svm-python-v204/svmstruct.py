@@ -135,7 +135,7 @@ def classify_example(x, sm, sparm):
 
     # TODO
     # Viterbi to get ans.
-    ans = viterbi(sm.w, x)
+    ans = viterbi(sm.w, x, y)
     return ans
 
 def find_most_violated_constraint(x, y, sm, sparm):
@@ -156,7 +156,7 @@ def find_most_violated_constraint(x, y, sm, sparm):
     risk bound condition, but without any regularization."""
 
     # TODO
-    y_bar = viterbi(sm.w, x)
+    y_bar = viterbi(sm.w, x, y)
     return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
