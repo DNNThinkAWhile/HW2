@@ -8,7 +8,7 @@ def read_map(file_label, file_48_idx):
     d_phone_alphabet = {}
     with open(file_48_idx, 'r') as f:
         for line in f:
-            tokens = line.strip().split('\t')
+            tokens = line.strip().split()
             # map phonemes(sil, aa,..) to alphabets(a, b, c,..)
             d_phone_alphabet[tokens[0]] = tokens[2]
             # map phonemes(sil, aa,..) to their indices(int), 0:47
