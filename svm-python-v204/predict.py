@@ -26,15 +26,7 @@ def backtrace(seq_length, tail, parent):
         path[l] = parent[path[l+1], l+1]
     return path.tolist()
 
-def err(y, l, prob, tmp_next, parent):
-    cost = np.zeros((48,1))
-    for k in range(48):
-        y_bar = backtrace(l, prob[k,l], parent)
-        y_bar.append(tmp_next[k])
-        cost[k] = costfunc.EditDistanceCost.fn(y[0:l+2], y_bar)
-    return cost
-
-def viterbi(w, x, y):
+def viterbi(w, x):
     
     # observation matrix
     ob = np.asarray(w[0:69*48]) 
@@ -58,10 +50,6 @@ def viterbi(w, x, y):
     prob = np.log(p)
     for l in range(1, seq_length):
         tmp_prob = np.tile(prob[:,l-1].reshape(48,1), 48) + tr
-        tmp_next = np.argmax(tmp_prob, 0)
-        # for every phone of next layer, find its err(y,ybar)
-        cost = err(y, l, prob, tmp_next, parent)
-        tmp_prob += cost
         parent[:,l] = np.argmax(tmp_prob, 0)
         prob[:,l] += np.max(tmp_prob, 0)
     
@@ -75,9 +63,8 @@ def main():
 
     w = np.random.random(69*48+48*48)
     x= np.random.random((seq_length, dim))
-    y = np.random.randint(0,48,seq_length)
-    y_bar = viterbi(w, x, y)
-    print y_bar
+    ans = viterbi(w, x)
+    print ans
 
 if __name__ == '__main__':
     main()
