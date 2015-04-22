@@ -116,23 +116,10 @@ def init_constraints(sample, sm, sparm):
     i.e., no constraints."""
     import svmapi
 
-    if True:
-        # Just some example cosntraints.
-        c, d = svmapi.Sparse, svmapi.Document
-        # Return some really goofy constraints!  Normally, if the SVM
-        # is allowed to converge normally, the second and fourth
-        # features are 0 and -1 respectively for sufficiently high C.
-        # Let's make them be greater than 1 and 0.2 respectively!!
-        # Both forms of a feature vector (sparse and then full) are
-        # shown.
-        return [(d([c([(1,1)])],slackid=len(sample)+1),   1),
-                (d([c([0,0,0,1])],slackid=len(sample)+1),.2)]
-    # Encode positivity constraints.  Note that this constraint is
-    # satisfied subject to slack constraints.
     constraints = []
-    for i in xrange(sm.size_psi):
+    for i in xrange(len(sample)):
         # Create a sparse vector which selects out a single feature.
-        sparse = svmapi.Sparse([(i,1)])
+        sparse = svmapi.Sparse([sample[i][1]])
         # The left hand side of the inequality is a document.
         lhs = svmapi.Document([sparse], costfactor=1, slackid=i+1+len(sample))
         # Append the lhs and the rhs (in this case 0).

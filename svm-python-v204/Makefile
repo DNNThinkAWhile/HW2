@@ -18,7 +18,6 @@ TARGETNAME := python
 TRAIN_TARGET := svm_$(TARGETNAME)_learn
 CLASS_TARGET := svm_$(TARGETNAME)_classify
 
-DEFAULT_MODULE := multiclass
 DEFAULT_MODULE := svmstruct
 
 PY_OBJS := $(patsubst %.c,%.o,$(wildcard pyobjs/*.c))
