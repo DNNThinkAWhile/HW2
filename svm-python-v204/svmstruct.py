@@ -4,7 +4,7 @@ import costfunc
 from costfunc import * # class EditDistanceCost, EditDistanceCost(str1, str2)
 import predict
 import random
-import feature_vector 
+import feature_vector
 import sys
 import operator as op
 
@@ -162,7 +162,7 @@ def find_most_violated_constraint(x, y, sm, sparm):
 
     # TODO
     print 'finding most violated cons. ...'
-    y_bar = viterbi(sm.w, x, y)
+    y_bar = viterbi(list(sm.w), x, y)
     return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
