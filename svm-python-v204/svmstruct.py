@@ -1,5 +1,7 @@
-import viterbi  # viterbi(w, X)
-import costfunc # class EditDistanceCost, EditDistanceCost(str1, str2)
+from viterbi import * # viterbi(w, x, y)
+from costfunc import * # class EditDistanceCost, EditDistanceCost(str1, str2)
+import predict
+import random
 import feature_vector
 import sys
 import operator as op
@@ -121,7 +123,7 @@ def init_constraints(sample, sm, sparm):
     constraints = []
     for i in xrange(len(sample)):
         # Create a sparse vector which selects out a single feature.
-        sparse = svmapi.Sparse([sample[i][1]])
+        sparse = svmapi.Sparse(sample[i][1])
         # The left hand side of the inequality is a document.
         lhs = svmapi.Document([sparse], costfactor=1, slackid=i+1+len(sample))
         # Append the lhs and the rhs (in this case 0).
@@ -137,7 +139,9 @@ def classify_example(x, sm, sparm):
 
     # TODO
     # Viterbi to get ans.
-    return sum([i*j for i,j in zip(x,sm.w[:-1])]) + sm.w[-1]
+    print 'classify ans'
+    ans = predict(sm.w, x)
+    return ans
 
 def find_most_violated_constraint(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
@@ -157,10 +161,9 @@ def find_most_violated_constraint(x, y, sm, sparm):
     risk bound condition, but without any regularization."""
 
     # TODO
-    score = classify_example(x,sm,sparm)
-    discy, discny = y*score, -y*score + 1
-    if discy > discny: return y
-    return -y
+    print 'finding most violated cons. ...'
+    y_bar = viterbi(list(sm.w), x, y)
+    return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
