@@ -10,11 +10,13 @@ def write_cut_file(filename, parts):
 
 def main():
 	# args: python cross_validation.py file 5
-	if (len(sys.argv) < 3):
-		print 'command: python cross_validation.py <train_file> <fold> '
+	if (len(sys.argv) < 4):
+		print 'command: python cross_validation.py <train_file> <fold> <regularization parameter c>'
+                exit()
 
 	filenm = sys.argv[1]
 	fold = int(sys.argv[2])
+        c = sys.argv[3]
 
 
 	# read train file
@@ -39,15 +41,20 @@ def main():
 		write_cut_file(train_fn, [lines[0: test_st], lines[test_end:]])
 
 		print 'training ...'
-		call(['./svm_python_learn',
-		      train_fn,
-		      model_fn]);
+                cmd = './svm_python_learn -c %s %s %s' %(c, train_fn, model_fn)
+                call(cmd, shell=True)
+		#call(['./svm_python_learn -c',
+                #      c,
+		#      train_fn,
+		#      model_fn])
 
 		print 'testing ...'
-		call(['./svm_python_classify',
-		      test_fn,
-		      model_fn,
-		      out_fn])
+                cmd = './svm_python_classify %s %s %s' %(test_fn, model_fn, out_fn)
+                call(cmd, shell=True)
+		#call(['./svm_python_classify',
+		#      test_fn,
+		#      model_fn,
+		#      out_fn])
 
 if __name__ == '__main__':
 	main()
