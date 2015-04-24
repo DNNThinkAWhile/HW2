@@ -140,7 +140,7 @@ def classify_example(x, sm, sparm):
     # TODO
     # Viterbi to get ans.
     print 'classify ans'
-    ans = predict(sm.w, x)
+    ans = predict(list(sm.w), x)
     return ans
 
 def find_most_violated_constraint(x, y, sm, sparm):
