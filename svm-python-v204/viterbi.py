@@ -31,7 +31,7 @@ def err(y, l, prob, tmp_next, parent):
     for k in range(48):
         y_bar = backtrace(l, prob[k,l], parent)
         y_bar.append(tmp_next[k])
-        cost[k] = costfunc.EditDistanceCost.fn(y[0:l+2], y_bar)
+        cost[k] = costfunc.SimpleDiffCost.fn(y[0:l+2], y_bar)
     return cost
 
 def viterbi(w, x, y):
@@ -40,10 +40,10 @@ def viterbi(w, x, y):
     if not np.any(w):
         flag = 1
     # observation matrix
-    ob = w[0:69*48] 
+    ob = w[0:69*48]
     ob = np.reshape(ob,(69,48))
     obT = ob.transpose()
-    
+
     # transition matrix
     tr = w[69*48:69*48+48*48]
     tr = np.reshape(tr,(48,48))
@@ -70,7 +70,7 @@ def viterbi(w, x, y):
         tmp_prob += cost
         parent[:,l] = np.argmax(tmp_prob, 0)
         prob[:,l] += np.max(tmp_prob, 0)
-    
+
     # Back Tracing...
     path = backtrace(seq_length, np.argmax(prob[:,seq_length-1]), parent)
     return path
