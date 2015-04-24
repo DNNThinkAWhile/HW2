@@ -276,7 +276,6 @@ def print_testing_stats(sample, sm, sparm, teststats):
     d_phone_alphabet = sparm.d_phone_alphabet
     with open(sparm.argv[4], 'r') as f:
         ylines = f.readlines()
-        
     
     for y in ylines:
         y_list = y.strip('[]\n').split(',')
@@ -289,7 +288,7 @@ def print_testing_stats(sample, sm, sparm, teststats):
                 trim_y_str += d_phone_alphabet[d_index_phone[y_ele]]
         trim_y_str.strip('K')
         all_y.append(trim_y_str)
-        
+    
     with open(sparm.argv[4], 'w') as f:
         print >> f,'id,phone_sequence'
         idx = 0

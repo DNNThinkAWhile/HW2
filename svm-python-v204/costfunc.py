@@ -40,14 +40,18 @@ class EditDistanceCost:
                 if str1[i - 1] == str2[j - 1]:
                     wk_mat[i][j] = wk_mat[i - 1][j - 1]
                 else:
-                    wk_mat[i][j] = min( 
-                        wk_mat[i - 1, j] + w[1], # deletion 
+                    wk_mat[i][j] = min(
+                        wk_mat[i - 1, j] + w[1], # deletion
                         wk_mat[i, j - 1] + w[0], # insertion
                         wk_mat[i - 1, j - 1] + w[2] # substitution
                         )
 
         return wk_mat[m][n]
 
+class SimpleDiffCost:
+    @staticmethod
+    def fn(str1, str2):
+        return sum([c1 == c2 for c1,c2 in zip(str1, str2)])
 
 def main():
     if len(sys.argv) != 3:
@@ -56,7 +60,7 @@ def main():
 
     str1 = sys.argv[1]
     str2 = sys.argv[2]
-    
+
     cost_clz = EditDistanceCost
 
     # set the weights for insertion, deletion, substitution
@@ -64,7 +68,7 @@ def main():
     cost_clz.set_weights(1, 1, 1) # ins, del, subs
     print 'new weights:', cost_clz.weights
 
-    # usage 
+    # usage
     cost = cost_clz.fn(str1, str2)
     print 'EditDistance between "', str1, '" and "', str2, '" is ', cost
 

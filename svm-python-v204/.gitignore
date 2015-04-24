@@ -1,3 +1,4 @@
 svm_python_classify
 svm_python_learn
 *.o
+*.pyc
