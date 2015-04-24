@@ -47,8 +47,6 @@ def viterbi(w, x, y):
     # transition matrix
     tr = w[69*48:69*48+48*48]
     tr = np.reshape(tr,(48,48))
-    if not flag:
-        tr = np.log(tr)
 
     # x
     np_x = np.asarray(x)
@@ -60,8 +58,6 @@ def viterbi(w, x, y):
     for s in range(seq_length):
         p[:,s] = np.sum(np.multiply(np_x[s,:], obT), 1)
     prob = p
-    if not flag:
-        prob = np.log(p)
     for l in range(1, seq_length):
         tmp_prob = np.tile(prob[:,l-1].reshape(48,1), 48) + tr
         tmp_next = np.argmax(tmp_prob, 0)
