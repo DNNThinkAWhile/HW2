@@ -56,7 +56,7 @@ def main():
 		#      test_fn,
 		#      model_fn,
 		#      out_fn])
-        print 'formation and trimming ...'
+                print 'formation and trimming ...'
                 cmd = 'python trim.py %s %s %s' %(test_fn, out_fn, result_fn)
                 call(cmd, shell=True)
 		#call(['python trim.py',
