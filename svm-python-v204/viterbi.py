@@ -77,7 +77,7 @@ def viterbi(w, x, y):
         tmp_path[i].append(i)
     # Back Tracing...
     #path = backtrace(seq_length, np.argmax(p[:,seq_length-1]), parent)
-    return tmp_path
+    return tmp_path[np.argmax(p[:,seq_length-1])]
 
 def main():
     seq_length = 5
