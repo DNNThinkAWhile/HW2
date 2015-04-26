@@ -32,6 +32,7 @@ def main():
 		test_fn = 'cv.' + str(i) + '.test.ark'
 		model_fn = 'cv.' + str(i) + '.model'
 		out_fn = 'cv.' + str(i) + '.out'
+                result_fn = 'cv.' + str(i) + '.result'
 
 		test_size = linenum / fold
 		test_st = 0 + i * test_size
@@ -55,6 +56,13 @@ def main():
 		#      test_fn,
 		#      model_fn,
 		#      out_fn])
-
+                print 'formation and trimming ...'
+                cmd = 'python trim.py %s %s %s' %(test_fn, out_fn, result_fn)
+                call(cmd, shell=True)
+		#call(['python trim.py',
+		#      test_fn,
+		#      out_fn,
+		#      result_fn])
+        
 if __name__ == '__main__':
 	main()

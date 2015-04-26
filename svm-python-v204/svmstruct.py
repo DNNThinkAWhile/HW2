@@ -20,8 +20,6 @@ def parse_parameters(sparm):
     # TODO
     # Let user input parameters with command lines
     sparm.arbitrary_parameter = 'I am an arbitrary parameter!'
-    sparm.d_speechid_index, sparm.d_index_phone, sparm.d_phone_index, sparm.d_phone_alphabet \
-        = feature_vector.read_map('../MLDS_HW1_RELEASE_v1/label/train.lab', '../MLDS_HW1_RELEASE_v1/phones/48_idx_chr.map')
 
 def parse_parameters_classify(attribute, value):
     """Process a single custom command line argument for the classifier.
@@ -274,32 +272,6 @@ def print_testing_stats(sample, sm, sparm, teststats):
     the teststats object through use of the eval_prediction function.
 
     The default behavior is that nothing is printed."""
-    all_y = []
-    d_index_phone = sparm.d_index_phone
-    d_phone_alphabet = sparm.d_phone_alphabet
-    with open(sparm.argv[4], 'r') as f:
-        ylines = f.readlines()
-    
-    for y in ylines:
-        y_list = y.strip('[]\n').split(',')
-        y_list = map(int, y_list)
-        trim_y_str = ''
-        current_y_idx = 999
-        for y_ele in y_list:
-            if y_ele != current_y_idx:
-                current_y_idx = y_ele
-                trim_y_str += d_phone_alphabet[d_index_phone[y_ele]]
-        trim_y_str.strip('K')
-        all_y.append(trim_y_str)
-    
-    with open(sparm.argv[4], 'w') as f:
-        print >> f,'id,phone_sequence'
-        idx = 0
-        for id in sparm.speech_id:
-            str = id + ',' + all_y[idx]
-            print >> f, str
-            idx += 1
-    print teststats
 
 def eval_prediction(exnum, (x, y), ypred, sm, sparm, teststats):
     """Accumulate statistics about a single training example.
