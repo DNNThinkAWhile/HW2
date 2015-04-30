@@ -226,7 +226,7 @@ def loss(y, ybar, sparm):
 
     The default behavior is to perform 0/1 loss based on the truth of
     y==ybar."""
-    cost_clz = costfunc.EditDistanceCost
+    cost_clz = costfunc.SimpleDiffCost
     cost = cost_clz.fn(y, ybar)
     print 'Cost = ', cost
     return cost
@@ -324,8 +324,8 @@ def write_label(fileptr, y):
     object is a file, not a string.  Attempts to close the file are
     ignored.)  The default behavior is equivalent to
     'print>>fileptr,y'"""
-    
-    
+
+
     print>>fileptr,y
 
 def print_help():
