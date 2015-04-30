@@ -2,7 +2,6 @@
 import sys
 from subprocess import call
 
-
 def write_cut_file(filename, parts):
 	with open(filename, 'w') as f:
 		for lines in parts:
@@ -16,7 +15,7 @@ def main():
 
 	filenm = sys.argv[1]
 	fold = int(sys.argv[2])
-        c = sys.argv[3]
+    c = sys.argv[3]
 
 
 	# read train file

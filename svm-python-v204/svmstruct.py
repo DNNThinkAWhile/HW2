@@ -286,7 +286,9 @@ def eval_prediction(exnum, (x, y), ypred, sm, sparm, teststats):
     On the first call, that is, when exnum==0, teststats==None.  The
     default behavior is that the function does nothing."""
     if exnum==0: teststats = []
-    print 'on example',exnum,'predicted',ypred,'where correct is',y
+    print 'on example', exnum
+    print 'predicted:', ypred
+    print 'ans:',y
     teststats.append(loss(y, ypred, sparm))
     return teststats
 
