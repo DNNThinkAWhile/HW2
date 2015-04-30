@@ -51,7 +51,7 @@ class EditDistanceCost:
 class SimpleDiffCost:
     @staticmethod
     def fn(str1, str2):
-        return sum([c1 == c2 for c1,c2 in zip(str1, str2)])
+        return sum([c1 != c2 for c1,c2 in zip(str1, str2)])
 
 def main():
     if len(sys.argv) != 3:
