@@ -1,5 +1,6 @@
 import numpy as np
 import costfunc
+import random as rd
 '''
 ob:    48 phone
 
@@ -27,6 +28,8 @@ def backtrace(seq_length, tail, parent):
     return path.tolist()
 
 def viterbi(w, x, y):
+    #np.set_printoptions(threshold=np.nan)
+
     w = np.asarray(w)
     # observation matrix
     ob = w[0:69*48]
@@ -40,7 +43,6 @@ def viterbi(w, x, y):
     np_x = np.asarray(x)
 
     seq_length, dim = np_x.shape
-    p = np.zeros((48, seq_length)) # propability along the path
     parent = np.ones((48, seq_length))*(-1) # parent for back tracing
     loss = np.ones((48,seq_length)) # for loss
 
@@ -48,18 +50,34 @@ def viterbi(w, x, y):
     p = np.transpose(p)
     loss[y[0],0] -= 1
 
+    #print 'p', p
+
+
+
     for l in range(1, seq_length):
         tmp_p = np.tile(p[:,l-1].reshape(48,1), 48) + tr
-        tmp_next = np.argmax(tmp_p, 0)
         # for every phone of next layer, find its err(y,ybar)
         loss[y[l],l] -= 1
         loss[:,l] += loss[:,l-1]
         tmp_p += loss[:,l]
+
+        #print l, 'tmp_p', tmp_p
+
         parent[:,l] = np.argmax(tmp_p, 0)
         p[:,l] += np.transpose(np.max(tmp_p, 0))
     # Back Tracing...
+
+
+
+    #print 'parent', parent
     path = backtrace(seq_length, np.argmax(p[:,seq_length-1]), parent)
-    return path
+    #return path
+
+    if all(i == 0 for i in w[0:10]):
+        return [rd.randint(0,47) for i in xrange(seq_length)]
+    else:
+        return path
+
 
 def main():
     seq_length = 5

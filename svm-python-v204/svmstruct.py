@@ -141,6 +141,9 @@ def classify_example(x, sm, sparm):
     ans = inference(list(sm.w), x)
     return ans
 
+class Hey:
+    i = 0
+
 def find_most_violated_constraint(x, y, sm, sparm):
     """Return ybar associated with x's most violated constraint.
 
@@ -160,6 +163,11 @@ def find_most_violated_constraint(x, y, sm, sparm):
 
     # TODO
     print 'finding most violated cons. ...'
+
+    Hey.i += 1
+    print 'i ', Hey.i
+
+
     y_bar = viterbi(list(sm.w), x, y)
     return y_bar
 
