@@ -71,22 +71,19 @@ def viterbi(w, x, y):
 
     #print 'parent', parent
     path = backtrace(seq_length, np.argmax(p[:,seq_length-1]), parent)
-    #return path
-
-    if all(i == 0 for i in w[0:10]):
-        return [rd.randint(0,47) for i in xrange(seq_length)]
-    else:
-        return path
+    return path
 
 
 def main():
-    seq_length = 5
+    seq_length = 400
     dim = 69
 
     w = np.random.random(69*48+48*48)
     x= np.random.random((seq_length, dim))
     y = np.random.randint(0,48,seq_length)
-    y_bar = viterbi(w, x, y)
+
+    for i in xrange(50):
+        y_bar = viterbi(w, x, y)
 
 if __name__ == '__main__':
     main()
