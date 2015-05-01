@@ -32,7 +32,7 @@ def viterbi(w, x, y):
     w = np.asarray(w[1:])
     # observation matrix
     ob = w[0:69*48]
-    ob = np.reshape(ob,(69,48))
+    ob = np.reshape(ob,(48,69)).transpose()
 
     # transition matrix
     tr = w[69*48:69*48+48*48]
@@ -44,11 +44,12 @@ def viterbi(w, x, y):
     seq_length, dim = np_x.shape
     parent = np.ones((48, seq_length))*(-1) # parent for back tracing
     loss = np.ones((48,seq_length)) # for loss
-
+    acc_loss = np.ones((48,seq_length))
     p = np.matrix(np_x)*np.matrix(ob)
     p = np.transpose(p)
     loss[y[0],0] -= 1
-
+    p[:,0] += np.reshape(loss[:,0],(48,1))
+    acc_loss[y[0],0] -= 1
     #print 'p', p
 
 
@@ -57,12 +58,14 @@ def viterbi(w, x, y):
         tmp_p = np.tile(p[:,l-1].reshape(48,1), 48) + tr
         # for every phone of next layer, find its err(y,ybar)
         loss[y[l],l] -= 1
-        loss[:,l] += loss[:,l-1]
-        tmp_p += loss[:,l]
+        acc_loss[y[0],0] -= 1
+        acc_loss[:,l] += acc_loss[:,l-1]
+        #tmp_p += loss[:,l]
 
         #print l, 'tmp_p', tmp_p
 
         parent[:,l] = np.argmax(tmp_p, 0)
+        p[:,l] += np.reshape(loss[:,l],(48,1))
         p[:,l] += np.transpose(np.max(tmp_p, 0))
     # Back Tracing...
 
@@ -70,6 +73,8 @@ def viterbi(w, x, y):
 
     #print 'parent', parent
     path = backtrace(seq_length, np.argmax(p[:,seq_length-1]), parent)
+    #print 'viterbi loss', acc_loss[np.argmax(p[:,seq_length-1]),(seq_length-1)]
+    #print 'viterbi cost', p[np.argmax(p[:,seq_length-1]),(seq_length-1)]
     return path
 
 

@@ -169,6 +169,7 @@ def find_most_violated_constraint(x, y, sm, sparm):
 
 
     y_bar = viterbi(list(sm.w), x, y)
+    #inference(list(sm.w), x) 
     return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
