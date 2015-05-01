@@ -30,7 +30,7 @@ def backtrace(seq_length, tail, parent):
 def viterbi(w, x, y):
     #np.set_printoptions(threshold=np.nan)
 
-    w = np.asarray(w)
+    w = np.asarray(w[1:])
     # observation matrix
     ob = w[0:69*48]
     ob = np.reshape(ob,(69,48))
@@ -78,12 +78,13 @@ def main():
     seq_length = 400
     dim = 69
 
-    w = np.random.random(69*48+48*48)
+    w = np.random.random(69*48+48*48+1)
     x= np.random.random((seq_length, dim))
     y = np.random.randint(0,48,seq_length)
 
     for i in xrange(50):
         y_bar = viterbi(w, x, y)
+        print y_bar
 
 if __name__ == '__main__':
     main()
