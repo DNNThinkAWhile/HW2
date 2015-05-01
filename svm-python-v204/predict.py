@@ -26,11 +26,10 @@ def backtrace(seq_length, tail, parent):
     return path.tolist()
 
 def inference(w, x):
-    
+    w = np.asarray(w[1:])    
     # observation matrix
-    ob = np.asarray(w[0:69*48]) 
+    ob = w[0:69*48] 
     ob = np.reshape(ob,(69,48))
-    obT = ob.transpose()
     
     # transition matrix
     tr = np.asarray(w[69*48:69*48+48*48])
@@ -40,11 +39,10 @@ def inference(w, x):
     np_x = np.asarray(x)
 
     seq_length, dim = np_x.shape
-    p = np.zeros((48, seq_length)) # propability along the path
     parent = np.ones((48, seq_length))*(-1) # parent for back tracing
 
-    for s in range(seq_length):
-        p[:,s] = np.sum(np.multiply(np_x[s,:], obT), 1)
+    p = np.matrix(np_x)*np.matrix(ob)
+    p = np.transpose(p) # propability along the path
     for l in range(1, seq_length):
         tmp_p = np.tile(p[:,l-1].reshape(48,1), 48) + tr
         parent[:,l] = np.argmax(tmp_p, 0)
