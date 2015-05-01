@@ -89,7 +89,7 @@ def init_model(sample, sm, sparm):
     perspective.  This function returns nothing."""
 
     # TODO
-    PsiSize = 69 * 48 + 48 * 48
+    PsiSize = 69 * 48 + 48 * 48 + 1
     sm.size_psi = PsiSize
 
 def init_constraints(sample, sm, sparm):
@@ -216,7 +216,8 @@ def psi(x, y, sm, sparm):
             transition[prev_yi * 48 + yi] += 1.0
         prev_yi = yi
 
-    thePsi = observation
+    thePsi = [0]
+    thePsi.extend(observation)
     thePsi.extend(transition)
 
     return svmapi.Sparse(thePsi)

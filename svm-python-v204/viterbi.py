@@ -29,7 +29,6 @@ def backtrace(seq_length, tail, parent):
 
 def viterbi(w, x, y):
     #np.set_printoptions(threshold=np.nan)
-
     w = np.asarray(w[1:])
     # observation matrix
     ob = w[0:69*48]

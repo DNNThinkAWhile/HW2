@@ -15,7 +15,7 @@ def main():
 
 	filenm = sys.argv[1]
 	fold = int(sys.argv[2])
-    c = sys.argv[3]
+        c = sys.argv[3]
 
 
 	# read train file
