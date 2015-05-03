@@ -6,12 +6,12 @@ CC = gcc
 LD = gcc
 #CC = attolcc -mempro -perfpro -block -proc -- gcc
 #LD = attolcc -mempro -perfpro -block -proc -- gcc
-CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall 
+CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall
 LDFLAGS = -O3 -lm -Wall
 CFLAGS = -g -Wall
 LDFLAGS = -g -lm
 #CFLAGS = -pg -Wall
-#LDFLAGS = -pg -lm -Wall 
+#LDFLAGS = -pg -lm -Wall
 
 OPTIMIZER := hideo
 TARGETNAME := python
@@ -22,11 +22,11 @@ DEFAULT_MODULE := svmstruct
 
 PY_OBJS := $(patsubst %.c,%.o,$(wildcard pyobjs/*.c))
 
-all: $(addsuffix $(OPTIMIZER),$(TRAIN_TARGET)_) $(CLASS_TARGET)
+all: $(addsuffix $(OPTIMIZER),$(TRAIN_TARGET)_) $(CLASS_TARGET) findmost.so
 
 .PHONY: clean
 clean: svm_light_clean svm_struct_clean
-	rm -f *.o *.tcov *.d core gmon.out *.stackdump 
+	rm -f *.o *.tcov *.d core gmon.out *.stackdump
 	rm -f $(PY_OBJS)
 	rm -rf $(TRAIN_TARGET) $(CLASS_TARGET)
 
@@ -58,13 +58,13 @@ PYTHON_CC_FLAGS := -I$(PYTHON_INCLUDE)
 #-----------------------#
 #----   SVM-light   ----#
 #-----------------------#
-svm_light_hideo_noexe: 
+svm_light_hideo_noexe:
 	cd svm_light; make svm_learn_hideo_noexe
 
-svm_light_loqo_noexe: 
+svm_light_loqo_noexe:
 	cd svm_light; make svm_learn_loqo_noexe
 
-svm_light_clean: 
+svm_light_clean:
 	cd svm_light; make clean
 
 #----------------------#
@@ -95,3 +95,9 @@ $(PY_OBJS): %.o : %.c %.h
 
 svm_struct_api.o: svm_struct_api.c svm_struct_api.h svm_struct_api_types.h svm_struct/svm_struct_common.h
 	$(CC) -c $(CFLAGS) $(PYTHON_CC_FLAGS) -DDEFAULT_MODULE=$(DEFAULT_MODULE) $< -o $@
+
+findmost.so: viterbi.o
+	$(CC) -shared $< -o $@ $(PYTHON_LD_FLAGS)
+
+viterbi.o: viterbi.c
+	$(CC) -c $< -o $@ $(PYTHON_CC_FLAGS) $(CFLAGS)

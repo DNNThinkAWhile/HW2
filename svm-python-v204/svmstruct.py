@@ -5,6 +5,7 @@ import random
 import feature_vector
 import sys
 import operator as op
+import findmost
 
 def parse_parameters(sparm):
     """Sets attributes of sparm based on command line arguments.
@@ -168,8 +169,14 @@ def find_most_violated_constraint(x, y, sm, sparm):
     print 'i ', Hey.i
 
 
-    y_bar = viterbi(list(sm.w), x, y)
-    #inference(list(sm.w), x) 
+    #y_bar = viterbi(list(sm.w), x, y)
+
+    xlist = []
+    for i in xrange(len(x)):
+        xlist.extend(x[i])
+
+    y_bar = findmost.find_most_interface(list(sm.w), xlist, y, len(y))
+
     return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):

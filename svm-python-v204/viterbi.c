@@ -1,11 +1,11 @@
-#include<string.h>
-#include<stdio.h>
-#include<assert.h>
-#include<stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <Python.h>
 
-
-#define LENGTH  3
-#define WIDTH   2
+#define LENGTH  69
+#define WIDTH   48
 
 
 /*
@@ -55,7 +55,7 @@ void printArrayI(int* d, int len) {
 
 
 // W is 1-base
-int* inference (double w[],  double x[] ,  int x_length)
+Array inference (double w[],  double x[] ,  int x_length)
 {
     double *bigmap = (double*)calloc(x_length*WIDTH, sizeof(double));
     int *backmap = (int*)calloc(x_length*WIDTH, sizeof(int));
@@ -120,14 +120,14 @@ int* inference (double w[],  double x[] ,  int x_length)
     free(backmap);
 
     // Interface
-    Array PATH;
-    PATH.data = path;
-    PATH.len = x_length;
+    Array pathArr;
+    pathArr.data = path;
+    pathArr.len = x_length;
 
-    return path;
+    return pathArr;
 }
 
-int* find_most_violated (double w[], double x[], int y[], int x_length)
+Array find_most_violated (double w[], double x[], int y[], int x_length)
 {
     double *bigmap = (double*)calloc(x_length*WIDTH, sizeof(double));
     int *backmap = (int*)calloc(x_length*WIDTH, sizeof(int));
@@ -151,9 +151,9 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
     // Viterbi
     int MaxEndIndex = 0;
     double MaxEndValue = 0.0;
-    for (int i = 0 ; i < WIDTH; i ++) 
+    for (int i = 0 ; i < WIDTH; i ++)
         lossmap[i] = (i == y[0] ? 0 : 1);
-    
+
     for (int j = 1 ; j < x_length; j ++) {
         for (int i = 0 ; i < WIDTH; i ++) {
             double tmpMax = -1 << 20;
@@ -179,9 +179,7 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
     int maxIdx = MaxEndIndex;
     path[x_length - 1] = maxIdx;
     for (int i = x_length - 1 ; i > 0 ; i --) {
-        printf("%d, %d\n", WIDTH*i + maxIdx, maxIdx);
         maxIdx = backmap[WIDTH * i + maxIdx];
-
         path[i - 1] = maxIdx;
     }
 
@@ -192,10 +190,15 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
     free(bigmap);
     free(backmap);
 
-    return path;
+    // Interface
+    Array pathArr;
+    pathArr.data = path;
+    pathArr.len = x_length;
+
+    return pathArr;
 }
 
-int main () {
+int main2 () {
 
 
     double w[] = {
@@ -221,13 +224,105 @@ int main () {
     };
 
     // should be 1->0->1
-    int* d = inference(w, x, 3);
-    int* e = find_most_violated(w, x, y, 3);
+    // int* d = inference(w, x, 3);
+    // int* e = find_most_violated(w, x, y, 3);
 
-    for (int i = 0; i < 3; i++) {
-        printf("%d\n", e[i]);
-    }
+    // for (int i = 0; i < 3; i++) {
+    //     printf("%d\n", e[i]);
+    // }
 
 
     return 0;
+}
+
+
+
+static PyObject* find_most_interface(PyObject* self, PyObject* args) {
+
+    PyObject *wobj; // 5617
+    PyObject *xobj;
+    PyObject *yobj;
+    int seqLen;
+
+    double w[(LENGTH + WIDTH) * WIDTH];
+    double *x;
+    double *y;
+    double* arrs[3];
+
+    // parse arguments
+    if (!PyArg_ParseTuple(args, "OOOi", &wobj, &xobj, &yobj, &seqLen)) {
+        // error
+        printf("arguments type (list, list, list, int)");
+        Py_RETURN_NONE;
+    }
+
+    x = (double*) calloc(LENGTH * seqLen, sizeof(double));
+    y = (double*) calloc(WIDTH * seqLen, sizeof(double));
+    arrs[0] = &w;
+    arrs[1] = x;
+    arrs[2] = y;
+
+    PyObject *witer = PyObject_GetIter(wobj);
+    PyObject *xiter = PyObject_GetIter(xobj);
+    PyObject *yiter = PyObject_GetIter(yobj);
+    PyObject *iters[3];
+    iters[0] = witer;
+    iters[1] = xiter;
+    iters[2] = yiter;
+
+    if (!(witer && xiter && yiter)) {
+        // error not iterator
+        printf("Not iterator?\n");
+    }
+
+    for (int i = 0; i < 3; i++) {
+        PyObject* iter = iters[i];
+        double* arr = arrs[i];
+
+        // get w
+        PyObject *next = PyIter_Next(iter);
+        for (int j = 0; next; j++, next = PyIter_Next(iter)) {
+            if (!PyFloat_Check(next) &&
+                !PyInt_Check(next) &&
+                !PyLong_Check(next)) {
+                // error, we were expecting a floating point value
+                printf("Item not float\n");
+                Py_RETURN_NONE;
+            }
+
+            arr[j] = PyFloat_AsDouble(next);
+        }
+    }
+
+
+    //puts("before find_most_violated");
+    Array path = find_most_violated(w, x, y, seqLen);
+    //puts("after find_most_violated");
+
+    PyObject *lst = PyList_New(path.len);
+    for (int i = 0; i < path.len; i++) {
+        PyObject *num = PyInt_FromLong((long)path.data[i]);
+        if (!num) {
+            Py_DECREF(lst);
+            return NULL;
+        }
+        PyList_SET_ITEM(lst, i, num);   // reference to num stolen
+    }
+
+    free(path.data);
+    return lst;
+
+    //Py_RETURN_NONE;
+}
+
+
+
+
+static PyMethodDef HelloMethods[] = {
+    {"find_most_interface", find_most_interface, METH_VARARGS, "intereteete"},
+    {NULL, NULL, 0, NULL}
+};
+
+PyMODINIT_FUNC initfindmost(void) {
+     (void) Py_InitModule("findmost", HelloMethods);
 }
