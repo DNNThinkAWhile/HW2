@@ -4,14 +4,20 @@ export
 
 CC = gcc
 LD = gcc
+OS := $(shell uname)
 #CC = attolcc -mempro -perfpro -block -proc -- gcc
 #LD = attolcc -mempro -perfpro -block -proc -- gcc
 CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall -fPIC -std=c99
 LDFLAGS = -O3 -lm -Wall
-#CFLAGS = -g -Wall
+#CFLAGS = -g -Wall -fPIC -O3
 #LDFLAGS = -g -lm
 #CFLAGS = -pg -Wall
 #LDFLAGS = -pg -lm -Wall
+
+# CFLAGS for OS X
+ifeq ($(shell uname),Darwin)
+    CFLAGS = -ffast-math -Wall -fPIC -std=c99
+endif
 
 OPTIMIZER := hideo
 TARGETNAME := python
@@ -26,7 +32,7 @@ all: $(addsuffix $(OPTIMIZER),$(TRAIN_TARGET)_) $(CLASS_TARGET) findmost.so
 
 .PHONY: clean
 clean: svm_light_clean svm_struct_clean
-	rm -f *.o *.tcov *.d core gmon.out *.stackdump
+	rm -f *.o *.tcov *.d core gmon.out *.stackdump *.so
 	rm -f $(PY_OBJS)
 	rm -rf $(TRAIN_TARGET) $(CLASS_TARGET)
 
