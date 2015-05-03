@@ -144,25 +144,23 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
             for (int i69 = 0; i69 < LENGTH ; i69 ++) {
                 tmp_sum += x[j*LENGTH + i69] * ob[WIDTH*i69 + i];
             }
-            bigmap[WIDTH*j + i] = tmp_sum;
+            lossmap[WIDTH*j + i ] = (i == y[j] ? 0 : 1 );
+            bigmap[WIDTH*j + i] = tmp_sum + lossmap[WIDTH*j + i];
        }
     }
 
     // Viterbi
     int MaxEndIndex = 0;
     double MaxEndValue = 0.0;
-    for (int i = 0 ; i < WIDTH; i ++)
-        lossmap[i] = (i == y[0] ? 0 : 1);
 
     for (int j = 1 ; j < x_length; j ++) {
         for (int i = 0 ; i < WIDTH; i ++) {
             double tmpMax = -1 << 20;
             for (int index = 0 ; index < WIDTH ; index ++) {
-                double compare = bigmap[WIDTH*(j-1) + index] + tr[index*WIDTH + i] + lossmap[WIDTH*(j-1) + index];
+                double compare = bigmap[WIDTH*(j-1) + index] + tr[index*WIDTH + i];
                 if (tmpMax < compare) {
                     tmpMax = compare;
                     backmap[WIDTH*j + i] = index;
-                    lossmap[WIDTH*j + i] = lossmap[WIDTH*(j-1) + index] + (i == y[j] ? 0 : 1);
                 }
             }
             bigmap[WIDTH*j + i] += tmpMax;
