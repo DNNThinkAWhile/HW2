@@ -4,8 +4,8 @@
 #include<stdlib.h>
 
 
-#define LENGTH  69
-#define WIDTH   48
+#define LENGTH  3
+#define WIDTH   2
 
 
 /*
@@ -13,6 +13,14 @@
  * CUDA style
  * backtrace char*
  */
+
+// Interface between Pythona and C
+
+typedef struct {
+    int* data;
+    int len;
+} Array;
+
 
 // Cost function
 double SimpleDiffCost (char* const A, char* const B)
@@ -53,13 +61,9 @@ int* inference (double w[],  double x[] ,  int x_length)
     int *backmap = (int*)calloc(x_length*WIDTH, sizeof(int));
     int *path = (int*)calloc(x_length, sizeof(int));
     // Observation array
-    double ob[LENGTH*WIDTH];
-    for (int i = 0; i < LENGTH*WIDTH; i ++)
-        ob[i] = w[i + 1]; // 1-base
+    double *ob = w + 1;
     // Transition array
-    double tr[WIDTH*WIDTH];
-    for (int i = 0; i < WIDTH*WIDTH ; i ++ )
-        tr[i] = w[LENGTH*WIDTH + i + 1]; // 1-base
+    double *tr = ob + LENGTH*WIDTH;
     // Matrix Multiply
     for (int i = 0; i < WIDTH; i ++) {
         for (int j = 0; j < x_length; j ++) {
@@ -105,12 +109,20 @@ int* inference (double w[],  double x[] ,  int x_length)
         path[i - 1] = maxIdx;
     }
 
-    // for (int i = 0; i < 3; i++) {
-    //     printf("%d, %f\n", path[i], bigmap[WIDTH * i + path[i]]);
-    // }
+    /*for (int i = 0 ; i < LENGTH ; i ++) {
+        for (int j = 0 ; j < WIDTH; j ++) {
+            printf("%f ",bigmap[LENGTH*i + j]);
+        }
+        printf("\n");
+    }*/
 
     free(bigmap);
     free(backmap);
+
+    // Interface
+    Array PATH;
+    PATH.data = path;
+    PATH.len = x_length;
 
     return path;
 }
@@ -122,13 +134,9 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
     int *path = (int*)calloc(x_length, sizeof(int));
     int *lossmap = (int*)calloc(x_length*WIDTH, sizeof(int));
     // Observation array
-    double ob[LENGTH*WIDTH];
-    for (int i = 0; i < LENGTH*WIDTH; i ++)
-        ob[i] = w[i + 1]; // 1-base
+    double *ob = w + 1;
     // Transition array
-    double tr[WIDTH*WIDTH];
-    for (int i = 0; i < WIDTH*WIDTH ; i ++ )
-        tr[i] = w[LENGTH*WIDTH + i + 1]; // 1-base
+    double *tr = ob + LENGTH*WIDTH;
     // Matrix Multiply
     for (int i = 0; i < WIDTH; i ++) {
         for (int j = 0; j < x_length; j ++) {
@@ -155,7 +163,6 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
                     tmpMax = compare;
                     backmap[WIDTH*j + i] = index;
                     lossmap[WIDTH*j + i] = lossmap[WIDTH*(j-1) + index] + (i == y[j] ? 0 : 1);
-                    printf("set backmap %d, %d\n", WIDTH*j+i, index);
                 }
             }
             bigmap[WIDTH*j + i] += tmpMax;
@@ -209,12 +216,18 @@ int main () {
         2, 3, 3
     };
 
+    int y[] = {
+        1, 1, 1
+    };
+
     // should be 1->0->1
     int* d = inference(w, x, 3);
+    int* e = find_most_violated(w, x, y, 3);
 
     for (int i = 0; i < 3; i++) {
-        printf("%d\n", d[i]);
+        printf("%d\n", e[i]);
     }
+
 
     return 0;
 }
