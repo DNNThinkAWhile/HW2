@@ -1,6 +1,7 @@
 #include<string.h>
 #include<stdio.h>
 #include<assert.h>
+#include<stdlib.h>
 
 // Cost function
 double SimpleDiffCost (char* const A, char* const B) 
