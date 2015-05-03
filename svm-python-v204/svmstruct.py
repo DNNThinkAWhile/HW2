@@ -163,10 +163,10 @@ def find_most_violated_constraint(x, y, sm, sparm):
     risk bound condition, but without any regularization."""
 
     # TODO
-    print 'finding most violated cons. ...'
+    #print 'finding most violated cons. ...'
 
     Hey.i += 1
-    print 'i ', Hey.i
+    #print 'i ', Hey.i
 
 
     #y_bar = viterbi(list(sm.w), x, y)
@@ -247,7 +247,7 @@ def loss(y, ybar, sparm):
     y==ybar."""
     cost_clz = costfunc.SimpleDiffCost
     cost = cost_clz.fn(y, ybar)
-    print 'Cost = ', cost
+    #print 'Cost = ', cost
     return cost
 
 def print_iteration_stats(ceps, cached_constraint, sample, sm,
