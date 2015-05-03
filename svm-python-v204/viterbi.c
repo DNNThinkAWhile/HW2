@@ -36,6 +36,14 @@ double SimpleDiffCost (char* const A, char* const B)
     return Diff;
 }
 
+int isAllZero(int* d, int len) {
+    for (int i = 0; i < len; i++) {
+        if (d[i] != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 void printArray(double* d, int len) {
     printf("print array:");
@@ -142,7 +150,7 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
         for (int j = 0; j < x_length; j ++) {
             double tmp_sum = 0.0;
             for (int i69 = 0; i69 < LENGTH ; i69 ++) {
-                tmp_sum += x[j*LENGTH + i69] * ob[WIDTH*i69 + i];
+                tmp_sum += x[j*LENGTH + i69] * ob[i*LENGTH + i69];
             }
             //printf("%d %d \n", i, y[j]);
             lossmap[WIDTH*j + i ] = (i == y[j] ? 0 : 1 );
@@ -150,7 +158,7 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
        }
     }
 
-    //printArray(lossmap, x_length*WIDTH);
+    //printArrayI(lossmap, x_length*WIDTH);
 
     // Viterbi
     int MaxEndIndex = 0;
@@ -176,6 +184,7 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
         }
     }
 
+
     // Backtrace
     int maxIdx = MaxEndIndex;
     path[x_length - 1] = maxIdx;
@@ -183,10 +192,6 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
         maxIdx = backmap[WIDTH * i + maxIdx];
         path[i - 1] = maxIdx;
     }
-
-    // for (int i = 0; i < 3; i++) {
-    //     printf("%d, %f\n", path[i], bigmap[WIDTH * i + path[i]]);
-    // }
 
     free(bigmap);
     free(backmap);
@@ -306,12 +311,9 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
 
 
 
-
-    //printArrayI(y, seqLen);
-
-    //puts("before find_most_violated");
     Array path = find_most_violated(w, x, y, seqLen);
-    //puts("after find_most_violated");
+
+
 
     PyObject *lst = PyList_New(path.len);
     for (int i = 0; i < path.len; i++) {
