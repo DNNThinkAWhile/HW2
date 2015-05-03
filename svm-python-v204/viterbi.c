@@ -144,10 +144,13 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
             for (int i69 = 0; i69 < LENGTH ; i69 ++) {
                 tmp_sum += x[j*LENGTH + i69] * ob[WIDTH*i69 + i];
             }
+            //printf("%d %d \n", i, y[j]);
             lossmap[WIDTH*j + i ] = (i == y[j] ? 0 : 1 );
             bigmap[WIDTH*j + i] = tmp_sum + lossmap[WIDTH*j + i];
        }
     }
+
+    //printArray(lossmap, x_length*WIDTH);
 
     // Viterbi
     int MaxEndIndex = 0;
@@ -244,8 +247,8 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
 
     double w[(LENGTH + WIDTH) * WIDTH];
     double *x;
-    double *y;
-    double* arrs[3];
+    int *y;
+    double* darrs[2];
 
     // parse arguments
     if (!PyArg_ParseTuple(args, "OOOi", &wobj, &xobj, &yobj, &seqLen)) {
@@ -256,28 +259,26 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
 
     x = (double*) calloc(LENGTH * seqLen, sizeof(double));
     y = (double*) calloc(WIDTH * seqLen, sizeof(double));
-    arrs[0] = &w;
-    arrs[1] = x;
-    arrs[2] = y;
+    darrs[0] = &w;
+    darrs[1] = x;
 
     PyObject *witer = PyObject_GetIter(wobj);
     PyObject *xiter = PyObject_GetIter(xobj);
     PyObject *yiter = PyObject_GetIter(yobj);
-    PyObject *iters[3];
+    PyObject *iters[2];
     iters[0] = witer;
     iters[1] = xiter;
-    iters[2] = yiter;
 
     if (!(witer && xiter && yiter)) {
         // error not iterator
         printf("Not iterator?\n");
     }
 
-    for (int i = 0; i < 3; i++) {
+    // w and x
+    for (int i = 0; i < 2; i++) {
         PyObject* iter = iters[i];
-        double* arr = arrs[i];
+        double* arr = darrs[i];
 
-        // get w
         PyObject *next = PyIter_Next(iter);
         for (int j = 0; next; j++, next = PyIter_Next(iter)) {
             if (!PyFloat_Check(next) &&
@@ -287,11 +288,26 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
                 printf("Item not float\n");
                 Py_RETURN_NONE;
             }
-
             arr[j] = PyFloat_AsDouble(next);
         }
     }
 
+
+
+    PyObject *next = PyIter_Next(yiter);
+    for (int j = 0; next; j++, next = PyIter_Next(yiter)) {
+        if (!PyInt_Check(next)) {
+            // error, we were expecting a floating point value
+            printf("Item not float\n");
+            Py_RETURN_NONE;
+        }
+        y[j] = (int) PyInt_AsSsize_t(next);
+    }
+
+
+
+
+    //printArrayI(y, seqLen);
 
     //puts("before find_most_violated");
     Array path = find_most_violated(w, x, y, seqLen);

@@ -175,8 +175,10 @@ def find_most_violated_constraint(x, y, sm, sparm):
     for i in xrange(len(x)):
         xlist.extend(x[i])
 
+    #print y
     y_bar = findmost.find_most_interface(list(sm.w), xlist, y, len(y))
 
+    #print y_bar
     return y_bar
 
 def find_most_violated_constraint_slack(x, y, sm, sparm):
