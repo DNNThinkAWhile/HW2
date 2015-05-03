@@ -6,10 +6,10 @@ CC = gcc
 LD = gcc
 #CC = attolcc -mempro -perfpro -block -proc -- gcc
 #LD = attolcc -mempro -perfpro -block -proc -- gcc
-CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall
+CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall -fPIC -std=c99
 LDFLAGS = -O3 -lm -Wall
-CFLAGS = -g -Wall
-LDFLAGS = -g -lm
+#CFLAGS = -g -Wall
+#LDFLAGS = -g -lm
 #CFLAGS = -pg -Wall
 #LDFLAGS = -pg -lm -Wall
 
