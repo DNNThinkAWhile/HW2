@@ -3,6 +3,12 @@
 #include<assert.h>
 #include<stdlib.h>
 
+/*
+ * TODO :
+ * CUDA style
+ * backtrace char*
+ */
+
 // Cost function
 double SimpleDiffCost (char* const A, char* const B) 
 {
