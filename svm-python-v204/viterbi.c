@@ -250,7 +250,7 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
     PyObject *yobj;
     int seqLen;
 
-    double w[(LENGTH + WIDTH) * WIDTH];
+    double w[(LENGTH + WIDTH) * WIDTH + 1];
     double *x;
     int *y;
     double* darrs[2];
