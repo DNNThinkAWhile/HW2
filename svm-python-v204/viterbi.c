@@ -77,15 +77,16 @@ Array inference (double w[],  double x[] ,  int x_length)
         for (int j = 0; j < x_length; j ++) {
             double tmp_sum = 0.0;
             for (int i69 = 0; i69 < LENGTH ; i69 ++) {
-                tmp_sum += x[j*LENGTH + i69] * ob[WIDTH*i69 + i];
+                tmp_sum += x[j*LENGTH + i69] * ob[i*LENGTH + i69];
             }
-            bigmap[WIDTH*j + i] = tmp_sum;
+            bigmap[WIDTH*j + i] = tmp_sum ;
        }
     }
 
     // Viterbi
     int MaxEndIndex = 0;
     double MaxEndValue = 0.0;
+
     for (int j = 1 ; j < x_length; j ++) {
         for (int i = 0 ; i < WIDTH; i ++) {
             double tmpMax = -1 << 20;
@@ -94,7 +95,6 @@ Array inference (double w[],  double x[] ,  int x_length)
                 if (tmpMax < compare) {
                     tmpMax = compare;
                     backmap[WIDTH*j + i] = index;
-                    printf("set backmap %d, %d\n", WIDTH*j+i, index);
                 }
             }
             bigmap[WIDTH*j + i] += tmpMax;
@@ -107,22 +107,14 @@ Array inference (double w[],  double x[] ,  int x_length)
         }
     }
 
+
     // Backtrace
     int maxIdx = MaxEndIndex;
     path[x_length - 1] = maxIdx;
     for (int i = x_length - 1 ; i > 0 ; i --) {
-        printf("%d, %d\n", WIDTH*i + maxIdx, maxIdx);
         maxIdx = backmap[WIDTH * i + maxIdx];
-
         path[i - 1] = maxIdx;
     }
-
-    /*for (int i = 0 ; i < LENGTH ; i ++) {
-        for (int j = 0 ; j < WIDTH; j ++) {
-            printf("%f ",bigmap[LENGTH*i + j]);
-        }
-        printf("\n");
-    }*/
 
     free(bigmap);
     free(backmap);
