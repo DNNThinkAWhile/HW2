@@ -18,6 +18,7 @@
 /***********************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
@@ -46,15 +47,54 @@ void        svm_struct_classify_api_exit()
      that might be necessary. */
 }
 
+#define LENGTH 69
+#define WIDTH 48
 SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 {
   /* Reads struct examples and returns them in sample. The number of
      examples must be written into sample.n */
   SAMPLE   sample;  /* sample */
   EXAMPLE  *examples;
-  long     n;       /* number of examples */
+  int     n;       /* number of examples */
 
-  n=100; /* replace by appropriate number of examples */
+  if (file == NULL) {
+    printf("Error: File name = null\n");
+    exit(-1);
+  }
+
+  FILE* rFILE;
+  char* pNAME;
+  double data[LENGTH];
+
+  rFILE = fopen(file, "r");
+
+  if (rFILE == NULL) {
+    printf("Fail to open file");
+    exit(-1);
+  }
+
+  // Read file until it ends
+  n = 0;
+  char * line = NULL;
+  size_t len;
+  size_t read;
+  while ((read = getline(&line, &len, rFILE) != -1)) {
+      n++;
+/*      // fuck u parse the line
+      printf("len %zu: \n", read);
+      //printf("%s, n = %d\n", line, n);
+      int i = 0;
+      for (; line[i] != EOF ; i ++) {
+        printf("%s",line[i]);
+      }*/
+  }
+  printf("\nn = %d\n",n);
+
+  fclose(rFILE);
+  if (line)
+      free(line);
+
+  //n=100; /* replace by appropriate number of examples */
   examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
 
   /* fill in your code here */
@@ -74,7 +114,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
      weights that can be learned. Later, the weight vector w will
      contain the learned weights for the model. */
 
-  sm->sizePsi=100; /* replace by appropriate number of features */
+  sm->sizePsi=LENGTH*WIDTH + WIDTH*WIDTH + 1; /* replace by appropriate number of features */
 }
 
 CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
@@ -191,6 +231,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
      shall return an empty label as recognized by the function
      empty_label(y). */
   LABEL ybar;
+  exit(-1);
 
   /* insert your code for computing the label ybar here */
 
@@ -203,7 +244,8 @@ int         empty_label(LABEL y)
      returned by find_most_violated_constraint_???(x, y, sm) if there
      is no incorrect label that can be found for x, or if it is unable
      to label x at all */
-  return(0);
+
+  return(y.head==NULL && y.size == 0 ? 1 : 0);
 }
 
 SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
@@ -242,8 +284,22 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
      y==ybar has to be zero. sparm->loss_function is set with the -l option. */
   if(sparm->loss_function == 0) { /* type 0 loss: 0/1 loss */
                                   /* return 0, if y==ybar. return 1 else */
+      if (y.size != ybar.size)
+          exit(-1);
+      double error = 0.0;
+      for (int i = 0 ; i < y.size ; i ++) 
+          error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
+      return error;
+      
   }
   else {
+      if (y.size != ybar.size)
+          exit(-1);
+      double error = 0.0;
+      for (int i = 0 ; i < y.size ; i ++) 
+          error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
+      return error;
+      
     /* Put your code for different loss functions here. But then
        find_most_violated_constraint_???(x, y, sm) has to return the
        highest scoring label with the largest loss. */

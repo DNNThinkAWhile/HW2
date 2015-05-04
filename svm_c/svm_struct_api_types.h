@@ -52,17 +52,21 @@
 */
 # define COMPACT_ROUNDING_THRESH 10E-15
 
+#define PATTERN_SIZE 69
+#define PHONE_SIZE 48
 
 typedef struct pattern {
   /* this defines the x-part of a training example, e.g. the structure
      for storing a natural language sentence in NLP parsing */
-  int add_your_variables_here;
+  char * seq_id;
+  double data[PATTERN_SIZE];
 } PATTERN;
 
 typedef struct label {
   /* this defines the y-part (the label) of a training example,
      e.g. the parse tree of the corresponding sentence. */
-  int add_your_variables_here;
+  int size;
+  int * head;
 } LABEL;
 
 typedef struct structmodel {
