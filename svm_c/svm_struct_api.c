@@ -24,6 +24,9 @@
 #include "svm_struct_api.h"
 #include <Python.h>
 
+#define LENGTH 69
+#define WIDTH 48
+
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
   /* Called in learning part before anything else is done to allow
@@ -48,8 +51,8 @@ void        svm_struct_classify_api_exit()
      that might be necessary. */
 }
 
-#define LENGTH 69
-#define WIDTH 48
+
+
 SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 {
   /* Reads struct examples and returns them in sample. The number of
@@ -305,7 +308,7 @@ int         empty_label(LABEL y)
      is no incorrect label that can be found for x, or if it is unable
      to label x at all */
 
-  return(y.head==NULL && y.size == 0 ? 1 : 0);
+  return(y.head==NULL || y.size == 0 ? 1 : 0);
 }
 
 SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
@@ -331,11 +334,22 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
      that ybar!=y that maximizes psi(x,ybar,sm)*sm.w (where * is the
      inner vector product) and the appropriate function of the
      loss + margin/slack rescaling method. See that paper for details. */
-  SVECTOR *fvec=NULL;
+  SVECTOR *sv=NULL;
+  double *psiArray = (double *)calloc(LENGTH * WIDTH + WIDTH * WIDTH * sizeof(double));
 
-  /* insert code for computing the feature vector for x and y here */
+  for (int j = 0 ; j < y.size ; j ++) {
+      // Observation
+    for (int i = 0 ; i < LENGTH ; i ++)
+        psiArray[y.head[j]*LENGTH + i] += x.data[i];
+      // Transition
+    if (j > 0) 
+        psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
+    
+  }
+      
+  
 
-  return(fvec);
+  return(sv);
 }
 
 double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
