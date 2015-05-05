@@ -130,7 +130,3 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
     return path;
 }
 
-int main() {
-
-    return 0;
-}

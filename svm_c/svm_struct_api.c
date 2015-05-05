@@ -64,7 +64,6 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
      examples must be written into sample.n */
   SAMPLE   sample;  /* sample */
   EXAMPLE  *examples;
-  int     n;       /* number of examples */
 
   if (file == NULL) {
     printf("Error: File name = null\n");
@@ -268,7 +267,7 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
      empty_label(y). */
   LABEL ybar;
 
-  printf("Should enter scale mode...\n");
+  printf("Should not enter scale mode...\n");
   exit(-1);
   /* insert your code for computing the label ybar here */
 
@@ -301,7 +300,17 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
      shall return an empty label as recognized by the function
      empty_label(y). */
   LABEL ybar;
-  printf("Finding most violated constraint...\n");
+  //printf("Finding most violated constraint...\n");
+  double * tmp_x = (double*)calloc(y.size* LENGTH, sizeof(double*));
+  for (int i = 0 ; i < y.size ; i ++ ) {
+    for ( int j = 0 ; j < LENGTH ; j ++) {
+        tmp_x[i*LENGTH + j] = x.features[i].data[j];
+    }
+  }
+  ybar.size = y.size;
+  ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
+
+  free(tmp_x);
 
   /* insert your code for computing the label ybar here */
 
