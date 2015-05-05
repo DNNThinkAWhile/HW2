@@ -9,7 +9,7 @@ LD = gcc
 
 CFLAGS =   $(SFLAGS) -O3 -fomit-frame-pointer -ffast-math -Wall -std=c11
 LDFLAGS =  $(SFLAGS) -O3 -lm -Wall
-CFLAGS =  $(SFLAGS) -pg -Wall -g
+#CFLAGS =  $(SFLAGS) -pg -Wall -g
 #LDFLAGS = $(SFLAGS) -pg -lm -Wall
 
 all: svm_empty_learn svm_empty_classify

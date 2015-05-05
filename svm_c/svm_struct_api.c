@@ -177,7 +177,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
      weights that can be learned. Later, the weight vector w will
      contain the learned weights for the model. */
 
-  sm->sizePsi=LENGTH*WIDTH + WIDTH*WIDTH + 1; /* replace by appropriate number of features */
+  sm->sizePsi=LENGTH*WIDTH + WIDTH*WIDTH ; /* replace by appropriate number of features */
 }
 
 CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
@@ -263,6 +263,8 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
      empty_label(y). */
   LABEL ybar;
 
+  printf("Should enter scale mode...\n");
+  exit(-1);
   /* insert your code for computing the label ybar here */
 
   return(ybar);
@@ -294,7 +296,6 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
      shall return an empty label as recognized by the function
      empty_label(y). */
   LABEL ybar;
-  exit(-1);
 
   /* insert your code for computing the label ybar here */
 
@@ -334,22 +335,35 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
      that ybar!=y that maximizes psi(x,ybar,sm)*sm.w (where * is the
      inner vector product) and the appropriate function of the
      loss + margin/slack rescaling method. See that paper for details. */
-  SVECTOR *sv=NULL;
-  double *psiArray = (double *)calloc(LENGTH * WIDTH + WIDTH * WIDTH * sizeof(double));
+  double *psiArray = (double *)calloc(LENGTH * WIDTH + WIDTH * WIDTH , sizeof(double));
 
   for (int j = 0 ; j < y.size ; j ++) {
       // Observation
     for (int i = 0 ; i < LENGTH ; i ++)
-        psiArray[y.head[j]*LENGTH + i] += x.data[i];
+        psiArray[y.head[j]*LENGTH + i] += x.features[j].data[i];
       // Transition
     if (j > 0) 
         psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
     
   }
-      
-  
 
-  return(sv);
+  SVECTOR* fvec = (SVECTOR*)my_malloc(sizeof(SVECTOR));
+  fvec -> words = (WORD*)my_malloc((sm->sizePsi + 1)*sizeof(WORD));
+
+  for (int i = 0 ; i < sm->sizePsi ; i ++) {
+    fvec->words[i].wnum = i + 1;
+    fvec->words[i].weight = psiArray[i];
+  }
+
+  // End fvec
+  fvec->words[sm->sizePsi].wnum=0;
+  fvec->twonorm_sq = -1;
+  fvec->userdefined = NULL;
+  fvec->kernel_id = 0;
+  fvec->next = NULL;
+  fvec->factor=1;
+      
+  return(fvec);
 }
 
 double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
