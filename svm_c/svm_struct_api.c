@@ -22,10 +22,15 @@
 #include <string.h>
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
+#include "findmost_classify.h"
 #include <Python.h>
 
+#ifndef LENGTH
 #define LENGTH 69
+#endif
+#ifndef WIDTH
 #define WIDTH 48
+#endif
 
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
@@ -296,6 +301,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
      shall return an empty label as recognized by the function
      empty_label(y). */
   LABEL ybar;
+  printf("Finding most violated constraint...\n");
 
   /* insert your code for computing the label ybar here */
 
