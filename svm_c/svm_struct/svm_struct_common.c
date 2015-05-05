@@ -62,5 +62,6 @@ void printW(double *w, long sizePhi, long n,double C)
   printf("\n");
 
 }
+
 /**** end print methods ****/
 
