@@ -3,7 +3,7 @@
 /*   svm_struct_api.c                                                  */
 /*                                                                     */
 /*   Definition of API for attaching implementing SVM learning of      */
-/*   structures (e.g. parsing, multi-label classification, HMM)        */ 
+/*   structures (e.g. parsing, multi-label classification, HMM)        */
 /*                                                                     */
 /*   Author: Thorsten Joachims                                         */
 /*   Date: 03.07.04                                                    */
@@ -22,6 +22,7 @@
 #include <string.h>
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
+#include <Python.h>
 
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
@@ -73,39 +74,98 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     exit(-1);
   }
 
-  // Read file until it ends
-  n = 0;
-  char * line = NULL;
-  size_t len;
-  size_t read;
-  while ((read = getline(&line, &len, rFILE) != -1)) {
-      n++;
-/*      // fuck u parse the line
-      printf("len %zu: \n", read);
-      //printf("%s, n = %d\n", line, n);
-      int i = 0;
-      for (; line[i] != EOF ; i ++) {
-        printf("%s",line[i]);
-      }*/
-  }
-  printf("\nn = %d\n",n);
-
-  fclose(rFILE);
-  if (line)
-      free(line);
-
   //n=100; /* replace by appropriate number of examples */
-  examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
 
-  /* fill in your code here */
 
-  sample.n=n;
+  Py_Initialize();
+
+  PyObject *module;
+  PyObject *readPy, *exPyList;
+  PyObject *exIter;
+  int r;
+  int exNum;
+
+  // need to add the current path to sys path
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append('.')");
+
+  module = PyImport_ImportModule("svm_struct_python");
+  readPy = PyObject_GetAttrString(module, "read_examples");
+
+  // exPyList is a python list of examples
+  exPyList = PyObject_CallFunction(readPy, "s", file);
+
+  exNum = PyList_Size(exPyList);
+  examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*exNum);
+
+  exIter = PyObject_GetIter(exPyList);
+  if (!exIter) {
+    printf("No iterator?\n");
+  }
+
+  // iterate through examples
+  PyObject* next = PyIter_Next(exIter);
+  for (int i = 0; next; i++, next=PyIter_Next(exIter)) {
+
+    if (!PyTuple_Check(next)) {
+      printf("Not tuple\n");
+      exit(-1);
+    }
+
+    // y is a list of int phonemes
+    // x is a list of lists of features
+    PyObject *x = PyTuple_GetItem(next, 0);
+    PyObject *y = PyTuple_GetItem(next, 1);
+    int seqLen = PyList_Size(y);
+    EXAMPLE *ex = &examples[i];
+    FEATURE *feats = (FEATURE*) calloc(seqLen, sizeof(FEATURE));
+    int *seq = (int*) calloc(seqLen, sizeof(int));
+
+    // printf("seqLen %d\n", seqLen);
+
+    // get all pairs of phoneme and feature
+    for (int j = 0; j < seqLen; j++) {
+      PyObject *phoPy = PyList_GetItem(y, j);
+      PyObject *featPy = PyList_GetItem(x, j);
+      int phoneme = PyInt_AsLong(phoPy);
+      int featSize = PyList_Size(featPy);
+
+      seq[j] = phoneme;
+      for (int k = 0; k < featSize; k++) {
+        PyObject *featK = PyList_GetItem(featPy, k);
+        feats[j].data[k] = PyFloat_AsDouble(featK);
+      }
+    }
+
+    // print what i read, please don't remove this for debugging
+    // for (int m = 0; m < seqLen; m++) {
+    //   printf("%d %d ", m, seq[m]);
+    //   for (int p = 0; p < 69; p++) {
+    //     printf("%f ", feats[m].data[p]);
+    //   }
+    //   puts("");
+    // }
+
+    ex->x.features = feats;
+    ex->y.size = seqLen;
+    ex->y.head = seq;
+  }
+
+  Py_DECREF(module);
+  Py_DECREF(readPy);
+  Py_DECREF(exPyList);
+  Py_DECREF(exIter);
+  Py_Finalize();
+
+
+  sample.n=exNum;
   sample.examples=examples;
+
   return(sample);
 }
 
-void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm, 
-			      STRUCT_LEARN_PARM *sparm, LEARN_PARM *lparm, 
+void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
+			      STRUCT_LEARN_PARM *sparm, LEARN_PARM *lparm,
 			      KERNEL_PARM *kparm)
 {
   /* Initialize structmodel sm. The weight vector w does not need to be
@@ -117,7 +177,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
   sm->sizePsi=LENGTH*WIDTH + WIDTH*WIDTH + 1; /* replace by appropriate number of features */
 }
 
-CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
+CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
 				    STRUCT_LEARN_PARM *sparm)
 {
   /* Initializes the optimization problem. Typically, you do not need
@@ -156,7 +216,7 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
   return(c);
 }
 
-LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
+LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
 				    STRUCT_LEARN_PARM *sparm)
 {
   /* Finds the label yhat for pattern x that scores the highest
@@ -173,8 +233,8 @@ LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
   return(y);
 }
 
-LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y, 
-						     STRUCTMODEL *sm, 
+LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
+						     STRUCTMODEL *sm,
 						     STRUCT_LEARN_PARM *sparm)
 {
   /* Finds the label ybar for pattern x that that is responsible for
@@ -182,7 +242,7 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
      formulation. For linear slack variables, this is that label ybar
      that maximizes
 
-            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar)) 
+            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar))
 
      Note that ybar may be equal to y (i.e. the max is 0), which is
      different from the algorithms described in
@@ -205,8 +265,8 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
   return(ybar);
 }
 
-LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y, 
-						     STRUCTMODEL *sm, 
+LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
+						     STRUCTMODEL *sm,
 						     STRUCT_LEARN_PARM *sparm)
 {
   /* Finds the label ybar for pattern x that that is responsible for
@@ -287,19 +347,19 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
       if (y.size != ybar.size)
           exit(-1);
       double error = 0.0;
-      for (int i = 0 ; i < y.size ; i ++) 
+      for (int i = 0 ; i < y.size ; i ++)
           error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
       return error;
-      
+
   }
   else {
       if (y.size != ybar.size)
           exit(-1);
       double error = 0.0;
-      for (int i = 0 ; i < y.size ; i ++) 
+      for (int i = 0 ; i < y.size ; i ++)
           error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
       return error;
-      
+
     /* Put your code for different loss functions here. But then
        find_most_violated_constraint_???(x, y, sm) has to return the
        highest scoring label with the largest loss. */
@@ -308,7 +368,7 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
 
 int         finalize_iteration(double ceps, int cached_constraint,
 			       SAMPLE sample, STRUCTMODEL *sm,
-			       CONSTSET cset, double *alpha, 
+			       CONSTSET cset, double *alpha,
 			       STRUCT_LEARN_PARM *sparm)
 {
   /* This function is called just before the end of each cutting plane iteration. ceps is the amount by which the most violated constraint found in the current iteration was violated. cached_constraint is true if the added constraint was constructed from the cache. If the return value is FALSE, then the algorithm is allowed to terminate. If it is TRUE, the algorithm will keep iterating even if the desired precision sparm->epsilon is already reached. */
@@ -316,7 +376,7 @@ int         finalize_iteration(double ceps, int cached_constraint,
 }
 
 void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
-					CONSTSET cset, double *alpha, 
+					CONSTSET cset, double *alpha,
 					STRUCT_LEARN_PARM *sparm)
 {
   /* This function is called after training and allows final touches to
@@ -325,7 +385,7 @@ void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
 }
 
 void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
-				       STRUCT_LEARN_PARM *sparm, 
+				       STRUCT_LEARN_PARM *sparm,
 				       STRUCT_TEST_STATS *teststats)
 {
   /* This function is called after making all test predictions in
@@ -335,8 +395,8 @@ void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
      statistics for each prediction. */
 }
 
-void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred, 
-			    STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm, 
+void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred,
+			    STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm,
 			    STRUCT_TEST_STATS *teststats)
 {
   /* This function allows you to accumlate statistic for how well the
@@ -348,7 +408,7 @@ void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred,
   }
 }
 
-void        write_struct_model(char *file, STRUCTMODEL *sm, 
+void        write_struct_model(char *file, STRUCTMODEL *sm,
 			       STRUCT_LEARN_PARM *sparm)
 {
   /* Writes structural model sm to file file. */
@@ -363,7 +423,7 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
 void        write_label(FILE *fp, LABEL y)
 {
   /* Writes label y to file handle fp. */
-} 
+}
 
 void        free_pattern(PATTERN x) {
   /* Frees the memory of x. */
@@ -373,7 +433,7 @@ void        free_label(LABEL y) {
   /* Frees the memory of y. */
 }
 
-void        free_struct_model(STRUCTMODEL sm) 
+void        free_struct_model(STRUCTMODEL sm)
 {
   /* Frees the memory of model. */
   /* if(sm.w) free(sm.w); */ /* this is free'd in free_model */
@@ -385,7 +445,7 @@ void        free_struct_sample(SAMPLE s)
 {
   /* Frees the memory of sample s. */
   int i;
-  for(i=0;i<s.n;i++) { 
+  for(i=0;i<s.n;i++) {
     free_pattern(s.examples[i].x);
     free_label(s.examples[i].y);
   }
@@ -407,8 +467,8 @@ void         parse_struct_parameters(STRUCT_LEARN_PARM *sparm)
   int i;
 
   for(i=0;(i<sparm->custom_argc) && ((sparm->custom_argv[i])[0] == '-');i++) {
-    switch ((sparm->custom_argv[i])[2]) 
-      { 
+    switch ((sparm->custom_argv[i])[2])
+      {
       case 'a': i++; /* strcpy(learn_parm->alphafile,argv[i]); */ break;
       case 'e': i++; /* sparm->epsilon=atof(sparm->custom_argv[i]); */ break;
       case 'k': i++; /* sparm->newconstretrain=atol(sparm->custom_argv[i]); */ break;
@@ -434,8 +494,8 @@ void         parse_struct_parameters_classify(STRUCT_LEARN_PARM *sparm)
   int i;
 
   for(i=0;(i<sparm->custom_argc) && ((sparm->custom_argv[i])[0] == '-');i++) {
-    switch ((sparm->custom_argv[i])[2]) 
-      { 
+    switch ((sparm->custom_argv[i])[2])
+      {
       /* case 'x': i++; strcpy(xvalue,sparm->custom_argv[i]); break; */
       default: printf("\nUnrecognized option %s!\n\n",sparm->custom_argv[i]);
 	       exit(0);
