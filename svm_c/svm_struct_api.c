@@ -237,8 +237,16 @@ LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
   LABEL y;
 
   /* insert your code for computing the predicted label y here */
+
+  double *tmp_x = (double*) calloc(x.size * LENGTH, sizeof(double));
+  for (int i = 0; i < x.size; i++) {
+    for (int j = 0; j < LENGTH; j++) {
+      tmp_x[i * LENGTH + j] = x.features[i].data[j];
+    }
+  }
+
   y.size = x.size;
-  y.head = inference(sm->w, x.features, x.size);
+  y.head = inference(sm->w, tmp_x, x.size);
 
   return(y);
 }
@@ -361,7 +369,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
         psiArray[y.head[j]*LENGTH + i] += x.features[j].data[i];
       // Transition
     if (j > 0)
-        psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
+        psiArray[LENGTH*WIDTH + y.head[j-1]*WIDTH + y.head[j] ] += 1.0;
 
   }
 
