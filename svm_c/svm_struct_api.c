@@ -605,6 +605,12 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
 void        write_label(FILE *fp, LABEL y)
 {
   /* Writes label y to file handle fp. */
+  int len = y.size;
+  fprintf(fp, "[%d", y.head[0]);
+  for (int i = 1; i < len; i++) {
+    fprintf(fp, ", %d", y.head[i]);
+  }
+  fprintf(fp, "]\n");
 }
 
 void        free_pattern(PATTERN x) {
