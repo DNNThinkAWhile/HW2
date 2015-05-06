@@ -33,7 +33,8 @@ def read_examples(filename):
             feat = [float(tok) for tok in tokens[1:]]
 
             # sequence id changed, store the last example
-            if not spch_id.startswith(seq_id):
+            if not spch_id.split('_')[0:2] == seq_id.split('_'):
+            #if not spch_id.startswith(seq_id):
                 if seq_id != DUMMY_STR:
                     examples.append((x, y))
                 seq_id = '_'.join(spch_id.split('_')[0:2]) # 'a_b_c' --> 'a_b'
@@ -41,7 +42,10 @@ def read_examples(filename):
                 y = []
 
             x.append(feat)
-            y.append(int(d_speechid_index[spch_id]))
+            if spch_id in d_speechid_index:
+                y.append(int(d_speechid_index[spch_id]))
+            else:
+                y.append(-1)
 
 
         examples.append((x, y))
@@ -50,9 +54,5 @@ def read_examples(filename):
 
     print 'read_examples done.a'
     print 'len:', len(examples)
-    for ex in examples:
-        print ' seqlen:', len(ex[0])
-
-    print 'hello'
 
     return examples
