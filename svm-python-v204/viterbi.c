@@ -187,7 +187,7 @@ Array find_most_violated (double w[], double x[], int y[], int x_length)
 
     free(bigmap);
     free(backmap);
-
+    free(lossmap);
     // Interface
     Array pathArr;
     pathArr.data = path;
@@ -255,8 +255,8 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
     }
 
     x = (double*) calloc(LENGTH * seqLen, sizeof(double));
-    y = (double*) calloc(WIDTH * seqLen, sizeof(double));
-    darrs[0] = &w;
+    y = (int*) calloc(WIDTH * seqLen, sizeof(int));
+    darrs[0] = w;
     darrs[1] = x;
 
     PyObject *witer = PyObject_GetIter(wobj);
@@ -286,6 +286,7 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
                 Py_RETURN_NONE;
             }
             arr[j] = PyFloat_AsDouble(next);
+            Py_DECREF(next);
         }
     }
 
@@ -299,9 +300,8 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
             Py_RETURN_NONE;
         }
         y[j] = (int) PyInt_AsSsize_t(next);
+        Py_DECREF(next);
     }
-
-
 
     Array path = find_most_violated(w, x, y, seqLen);
 
@@ -318,6 +318,11 @@ static PyObject* find_most_interface(PyObject* self, PyObject* args) {
     }
 
     free(path.data);
+    free(x);
+    free(y);
+    Py_DECREF(xiter);
+    Py_DECREF(witer);
+    Py_DECREF(yiter);
     return lst;
 
     //Py_RETURN_NONE;
