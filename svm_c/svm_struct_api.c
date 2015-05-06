@@ -153,6 +153,7 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     //   puts("");
     // }
 
+    ex->x.size = seqLen;
     ex->x.features = feats;
     ex->y.size = seqLen;
     ex->y.head = seq;
@@ -357,9 +358,9 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     for (int i = 0 ; i < LENGTH ; i ++)
         psiArray[y.head[j]*LENGTH + i] += x.features[j].data[i];
       // Transition
-    if (j > 0) 
+    if (j > 0)
         psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
-    
+
   }
 
   SVECTOR* fvec = (SVECTOR*)my_malloc(sizeof(SVECTOR));
@@ -377,7 +378,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   fvec->kernel_id = 0;
   fvec->next = NULL;
   fvec->factor=1;
-      
+
   return(fvec);
 }
 
