@@ -126,6 +126,7 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
 
     free(bigmap);
     free(backmap);
+    free(lossmap);
 
     return path;
 }

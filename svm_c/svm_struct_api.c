@@ -381,6 +381,8 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     fvec->words[i].weight = psiArray[i];
   }
 
+  free(psiArray);
+
   // End fvec
   fvec->words[sm->sizePsi].wnum=0;
   fvec->twonorm_sq = -1;
