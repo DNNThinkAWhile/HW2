@@ -31,7 +31,7 @@ char testfile[200];
 char modelfile[200];
 char predictionsfile[200];
 
-void read_input_parameters(int, char **, char *, char *, char *, 
+void read_input_parameters(int, char **, char *, char *, char *,
 			   STRUCT_LEARN_PARM *, long*, long *);
 void print_help(void);
 
@@ -43,7 +43,7 @@ int main (int argc, char* argv[])
   double t1,runtime=0;
   double avgloss=0,l;
   FILE *predfl;
-  STRUCTMODEL model; 
+  STRUCTMODEL model;
   STRUCT_LEARN_PARM sparm;
   STRUCT_TEST_STATS teststats;
   SAMPLE testsample;
@@ -67,7 +67,7 @@ int main (int argc, char* argv[])
     add_weight_vector_to_linear_model(model.svm_model);
     model.w=model.svm_model->lin_weights;
   }
-  
+
   if(struct_verbosity>=1) {
     printf("Reading test examples..."); fflush(stdout);
   }
@@ -80,24 +80,27 @@ int main (int argc, char* argv[])
     printf("Classifying test examples..."); fflush(stdout);
   }
 
+
+
   if ((predfl = fopen (predictionsfile, "w")) == NULL)
   { perror (predictionsfile); exit (1); }
+
+
 
   for(i=0;i<testsample.n;i++) {
     t1=get_runtime();
     y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
     runtime+=(get_runtime()-t1);
-
     write_label(predfl,y);
     l=loss(testsample.examples[i].y,y,&sparm);
     avgloss+=l;
-    if(l == 0) 
+    if(l == 0)
       correct++;
     else
       incorrect++;
-    eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
 
-    if(empty_label(testsample.examples[i].y)) 
+    eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
+    if(empty_label(testsample.examples[i].y))
       { no_accuracy=1; } /* test data is not labeled */
     if(struct_verbosity>=2) {
       if((i+1) % 100 == 0) {
@@ -105,14 +108,15 @@ int main (int argc, char* argv[])
       }
     }
     free_label(y);
-  }  
+  }
+
   avgloss/=testsample.n;
   fclose(predfl);
 
   if(struct_verbosity>=1) {
     printf("done\n");
     printf("Runtime (without IO) in cpu-seconds: %.2f\n",
-	   (float)(runtime/100.0));    
+	   (float)(runtime/100.0));
   }
   if((!no_accuracy) && (struct_verbosity>=1)) {
     printf("Average loss on test set: %.4f\n",(float)avgloss);
@@ -133,20 +137,20 @@ void read_input_parameters(int argc,char *argv[],char *testfile,
 			   long *verbosity,long *struct_verbosity)
 {
   long i;
-  
+
   /* set default */
   strcpy (modelfile, "svm_model");
-  strcpy (predictionsfile, "svm_predictions"); 
+  strcpy (predictionsfile, "svm_predictions");
   (*verbosity)=0;/*verbosity for svm_light*/
   (*struct_verbosity)=1; /*verbosity for struct learning portion*/
   struct_parm->custom_argc=0;
 
   for(i=1;(i<argc) && ((argv[i])[0] == '-');i++) {
-    switch ((argv[i])[1]) 
-      { 
+    switch ((argv[i])[1])
+      {
       case 'h': print_help(); exit(0);
       case '?': print_help(); exit(0);
-      case '-': strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);i++; strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);break; 
+      case '-': strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);i++; strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);break;
       case 'v': i++; (*struct_verbosity)=atol(argv[i]); break;
       case 'y': i++; (*verbosity)=atol(argv[i]); break;
       default: printf("\nUnrecognized option %s!\n\n",argv[i]);
