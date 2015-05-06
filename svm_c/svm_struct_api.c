@@ -615,10 +615,13 @@ void        write_label(FILE *fp, LABEL y)
 
 void        free_pattern(PATTERN x) {
   /* Frees the memory of x. */
+    free(x.features);
 }
 
 void        free_label(LABEL y) {
   /* Frees the memory of y. */
+    assert(!empty_label(y) && "Error: Freeing empty label...\n");
+    free(y.head);
 }
 
 void        free_struct_model(STRUCTMODEL sm)
