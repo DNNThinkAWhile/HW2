@@ -26,7 +26,7 @@
 #include <Python.h>
 
 #ifndef LENGTH
-#define LENGTH 69
+#define LENGTH 70
 #endif
 #ifndef WIDTH
 #define WIDTH 48
@@ -357,9 +357,11 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
 
   for (int j = 0 ; j < y.size ; j ++) {
       // Observation
-    for (int i = 0 ; i < LENGTH ; i ++)
+    for (int i = 0 ; i < LENGTH ; i ++) {
         psiArray[y.head[j]*LENGTH + i] += x.features[j].data[i];
-      // Transition
+        psiArray[y.head[y.size]*LENGTH + i] += x.features[j].data[i]; // Constant 1
+    }
+    // Transition
     if (j > 0)
         psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
 

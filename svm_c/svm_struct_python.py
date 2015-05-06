@@ -31,7 +31,7 @@ def read_examples(filename):
             tokens = line.strip().split(' ')
             spch_id = tokens[0]
             feat = [float(tok) for tok in tokens[1:]]
-
+            feat.append(1.0)
             # sequence id changed, store the last example
             if not spch_id.split('_')[0:2] == seq_id.split('_'):
             #if not spch_id.startswith(seq_id):

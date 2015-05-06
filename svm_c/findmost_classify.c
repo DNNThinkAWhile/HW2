@@ -1,7 +1,7 @@
 #include "findmost_classify.h"
 
 #ifndef LENGTH
-#define LENGTH  69
+#define LENGTH  70
 #endif
 #ifndef WIDTH
 #define WIDTH   48

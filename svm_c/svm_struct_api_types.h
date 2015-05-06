@@ -52,7 +52,7 @@
 */
 # define COMPACT_ROUNDING_THRESH 10E-15
 
-#define PATTERN_SIZE 69
+#define PATTERN_SIZE 70
 #define PHONE_SIZE 48
 
 
