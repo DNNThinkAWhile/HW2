@@ -23,6 +23,7 @@
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
 #include "findmost_classify.h"
+#include "viterbi.h"
 #include <Python.h>
 
 #ifndef LENGTH
@@ -145,9 +146,9 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     }
 
     // print what i read, please don't remove this for debugging
-    // for (int m = 0; m < seqLen; m++) {
-    //   printf("%d %d ", m, seq[m]);
-    //   for (int p = 0; p < 69; p++) {
+    //for (int m = 0; m < seqLen; m++) {
+    //    printf("%d %d ", m, seq[m]);
+    //   for (int p = 0; p < 70; p++) {
     //     printf("%f ", feats[m].data[p]);
     //   }
     //   puts("");
@@ -311,8 +312,8 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
     }
   }
   ybar.size = y.size;
-  ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
-
+//ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
+  ybar.head = viterbi(sm->w, tmp_x, y.head, y.size);
   free(tmp_x);
 
   /* insert your code for computing the label ybar here */
@@ -359,11 +360,11 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
       // Observation
     for (int i = 0 ; i < LENGTH ; i ++) {
         psiArray[y.head[j]*LENGTH + i] += x.features[j].data[i];
-        psiArray[y.head[y.size]*LENGTH + i] += x.features[j].data[i]; // Constant 1
+        psiArray[(LENGTH-1)*WIDTH + i] += x.features[j].data[i]; // Constant 1
     }
     // Transition
     if (j > 0)
-        psiArray[LENGTH*WIDTH + y.head[j]*WIDTH + y.head[j - 1] ] += 1.0;
+        psiArray[LENGTH*WIDTH + y.head[j - 1]*WIDTH + y.head[j] ] += 1.0;
 
   }
 

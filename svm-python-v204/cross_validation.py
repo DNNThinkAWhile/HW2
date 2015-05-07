@@ -27,11 +27,11 @@ def main():
 	for i in xrange(fold):
 		print 'fold ', i, ' starting'
 
-		train_fn = 'cv.' + str(i) + '.train.ark'
-		test_fn = 'cv.' + str(i) + '.test.ark'
-		model_fn = 'cv.' + str(i) + '.model'
-		out_fn = 'cv.' + str(i) + '.out'
-                result_fn = 'cv.' + str(i) + '.result'
+		train_fn = 'cv.' + str(i) + '.normalize.train.ark'
+		test_fn = 'cv.' + str(i) + '.normalize.test.ark'
+		model_fn = 'cv.' + str(i) + '.normalize.model'
+		out_fn = 'cv.' + str(i) + '.normalize.out'
+                result_fn = 'cv.' + str(i) + '.normalize.result'
 
 		test_size = linenum / fold
 		test_st = 0 + i * test_size
@@ -39,9 +39,9 @@ def main():
 
 		write_cut_file(test_fn, [lines[test_st: test_end]])
 		write_cut_file(train_fn, [lines[0: test_st], lines[test_end:]])
-
+'''
 		print 'training ...'
-                cmd = './svm_empty_learn -c %s %s %s' %(c, train_fn, model_fn)
+                cmd = '../svm_c/svm_empty_learn -c %s %s %s' %(c, train_fn, model_fn)
                 call(cmd, shell=True)
 		#call(['./svm_python_learn -c',
                 #      c,
@@ -49,7 +49,7 @@ def main():
 		#      model_fn])
 
 		print 'testing ...'
-                cmd = './svm_empty_classify %s %s %s' %(test_fn, model_fn, out_fn)
+                cmd = '../svm_c/svm_empty_classify %s %s %s' %(test_fn, model_fn, out_fn)
                 call(cmd, shell=True)
 		#call(['./svm_python_classify',
 		#      test_fn,
@@ -62,6 +62,6 @@ def main():
 		#      test_fn,
 		#      out_fn,
 		#      result_fn])
-        
+   '''     
 if __name__ == '__main__':
 	main()
