@@ -16,10 +16,10 @@ def main():
         seq_id = 'zzzz'
         for idx, line in enumerate(lines):
             tokens = line.strip().split(' ')
-            spch_id = tokens[0]
+            spch_id = '_'.join(token[0].split('_')[0:2]) # 'a_b_c' --> 'a_b'
             # sequence id changed, store the last example
-            if not spch_id.startswith(seq_id):
-                seq_id = '_'.join(spch_id.split('_')[0:2]) # 'a_b_c' --> 'a_b'
+            if not spch_id == seq_id:
+                seq_id = spch_id # 'a_b_c' --> 'a_b'
                 speech_IDs.append(seq_id)
 
     all_y = []
@@ -28,12 +28,17 @@ def main():
     
     for y in ylines:
         y_list = y.strip('[]\n').split(',')
+        y_list = [ele.strip() for ele in y_list]
         trim_y_str = ''
         current_y_idx = 999
+        for i in range(1,len(y_list)-1):
+                if (y_list[i] != y_list[i-1] & y_list[i] != y_list[i+1]):
+                    if (y_list[i-2] == y_list[i-1])
+                        y_list[i] = y_list[i-1]
         for y_ele in y_list:
             if y_ele != current_y_idx:
                 current_y_idx = y_ele
-                trim_y_str += d_phone_alphabet[d_index_phone[y_ele.strip()]]
+                trim_y_str += d_phone_alphabet[d_index_phone[y_ele]]
         trim_y_str = trim_y_str.strip('K')
         all_y.append(trim_y_str)
     
