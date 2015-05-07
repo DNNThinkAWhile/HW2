@@ -247,7 +247,7 @@ LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
 
   y.size = x.size;
   y.head = inference(sm->w, tmp_x, x.size);
-
+  free(tmp_x);
   return(y);
 }
 
@@ -322,6 +322,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
   ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
 
   free(tmp_x);
+
 
   /* insert your code for computing the label ybar here */
 
@@ -405,10 +406,10 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         exit(-1);
       }
       double error = 0.0;
-      for (int i = 0 ; i < y.size ; i ++)
-          error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
-      return error;
-
+      for (int i = 0 ; i < y.size ; i ++) {
+        if (ybar.head[i] != y.head[i]) return 1;
+      }
+      return 0;
   }
   else {
       if (y.size != ybar.size) {
@@ -417,7 +418,7 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
       }
       double error = 0.0;
       for (int i = 0 ; i < y.size ; i ++)
-          error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 );
+          error = error + (y.head[i] == ybar.head[i] ? 0.0 : 1.0 / y.size );
       return error;
 
     /* Put your code for different loss functions here. But then
@@ -557,8 +558,8 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
     perror ("Version of model-file does not match version of svm_struct_classify!");
     exit (1);
   }
-  //fscanf(fMdl,"%d%*[^\n]\n", &sparm->num_classes);
-  //fscanf(fMdl,"%d%*[^\n]\n", &sparm->num_features);
+  // fscanf(fMdl,"%d%*[^\n]\n", &sparm->num_classes);
+  // fscanf(fMdl,"%d%*[^\n]\n", &sparm->num_features);
   fscanf(fMdl,"%d%*[^\n]\n", &sparm->loss_function);
   fscanf(fMdl,"%ld%*[^\n]\n", &model->kernel_parm.kernel_type);
   fscanf(fMdl,"%ld%*[^\n]\n", &model->kernel_parm.poly_degree);
@@ -566,7 +567,6 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
   fscanf(fMdl,"%lf%*[^\n]\n", &model->kernel_parm.coef_lin);
   fscanf(fMdl,"%lf%*[^\n]\n", &model->kernel_parm.coef_const);
   fscanf(fMdl,"%[^#]%*[^\n]\n", model->kernel_parm.custom);
-
   fscanf(fMdl,"%ld%*[^\n]\n", &model->totwords);
   fscanf(fMdl,"%ld%*[^\n]\n", &model->totdoc);
   fscanf(fMdl,"%ld%*[^\n]\n", &(sm.sizePsi));

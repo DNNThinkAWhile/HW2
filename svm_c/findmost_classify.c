@@ -31,7 +31,7 @@ int* inference (double w[],  double x[] ,  int x_length)
 
     // Viterbi
     int MaxEndIndex = 0;
-    double MaxEndValue = 0.0;
+    double MaxEndValue = -1 << 20;
 
     for (int j = 1 ; j < x_length; j ++) {
         for (int i = 0 ; i < WIDTH; i ++) {
@@ -85,7 +85,7 @@ int* find_most_violated (double w[], double x[], int y[], int x_length)
             for (int i69 = 0; i69 < LENGTH ; i69 ++) {
                 tmp_sum += x[j*LENGTH + i69] * ob[i*LENGTH + i69];
             }
-            lossmap[WIDTH*j + i ] = (i == y[j] ? 0 : 1 );
+            lossmap[WIDTH*j + i ] = (i == y[j] ? 0 : 1.0 / x_length );
             bigmap[WIDTH*j + i] = tmp_sum + lossmap[WIDTH*j + i];
        }
     }

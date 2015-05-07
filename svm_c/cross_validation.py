@@ -18,6 +18,9 @@ def main():
     fold = int(sys.argv[2])
     c = sys.argv[3]
 
+    name = ''
+    if len(sys.argv) > 4:
+        name = '.' + sys.argv[4]
 
     # read train file
     lines = []
@@ -28,11 +31,11 @@ def main():
     for i in xrange(1):
         print 'fold ', i, ' starting'
 
-        train_fn = 'cv.' + str(i) + '.train.ark'
-        test_fn = 'cv.' + str(i) + '.test.ark'
-        model_fn = 'cv.' + str(i) + '.model'
-        out_fn = 'cv.' + str(i) + '.out'
-        result_fn = 'cv.' + str(i) + '.result'
+        train_fn = 'cv.' + str(i) + name + '.train.ark'
+        test_fn = 'cv.' + str(i) + name + '.test.ark'
+        model_fn = 'cv.' + str(i) + name + '.model'
+        out_fn = 'cv.' + str(i) + name + '.out'
+        result_fn = 'cv.' + str(i) + name + '.result'
 
         test_size = linenum / fold
         test_st = 0 + i * test_size

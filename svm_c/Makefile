@@ -17,6 +17,7 @@ all: svm_empty_learn svm_empty_classify
 .PHONY: clean
 clean: svm_light_clean svm_struct_clean
 	rm -f *.o *.tcov *.d core gmon.out *.stackdump
+	rm svm_empty_learn svm_empty_classify
 
 
 
