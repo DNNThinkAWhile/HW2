@@ -47,8 +47,9 @@ def main():
             print >> f, str
 
 def smooth(y_list):  
-    for i in range(1,len(y_list)-1):
-        if (y_list[i] != y_list[i-1]) & (y_list[i] != y_list[i+1]):
+    for i in range(1,len(y_list)-3):
+        if (y_list[i] != y_list[i-1]) & (y_list[i] != y_list[i+1]) | \
+                ((y_list[i] != y_list[i-1]) & (y_list[i] == y_list[i+1]) & (y_list[i] != y_list[i+2])):
             if (y_list[i-2] == y_list[i-1]):
                 y_list[i] = y_list[i-1]
     return y_list
