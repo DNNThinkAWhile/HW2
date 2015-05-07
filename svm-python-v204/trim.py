@@ -16,7 +16,7 @@ def main():
         seq_id = 'zzzz'
         for idx, line in enumerate(lines):
             tokens = line.strip().split(' ')
-            spch_id = '_'.join(token[0].split('_')[0:2]) # 'a_b_c' --> 'a_b'
+            spch_id = '_'.join(tokens[0].split('_')[0:2]) # 'a_b_c' --> 'a_b'
             # sequence id changed, store the last example
             if not spch_id == seq_id:
                 seq_id = spch_id # 'a_b_c' --> 'a_b'
@@ -31,7 +31,7 @@ def main():
         y_list = [ele.strip() for ele in y_list]
         trim_y_str = ''
         current_y_idx = 999
-        if(sys.argv[4] == '1')
+        if(sys.argv[4] == '1'):
             y_list = smooth(y_list)
         for y_ele in y_list:
             if y_ele != current_y_idx:
@@ -48,8 +48,8 @@ def main():
 
 def smooth(y_list):  
     for i in range(1,len(y_list)-1):
-        if (y_list[i] != y_list[i-1] & y_list[i] != y_list[i+1]):
-            if (y_list[i-2] == y_list[i-1])
+        if (y_list[i] != y_list[i-1]) & (y_list[i] != y_list[i+1]):
+            if (y_list[i-2] == y_list[i-1]):
                 y_list[i] = y_list[i-1]
     return y_list
             
