@@ -9,6 +9,7 @@ def main():
 
     d_speechid_index, d_index_phone, d_phone_index, d_phone_alphabet \
         = feature_vector.read_map('../MLDS_HW1_RELEASE_v1/label/train.lab', '../MLDS_HW1_RELEASE_v1/phones/48_idx_chr.map')
+    d_48_39 = create_48_39_map('../MLDS_HW1_RELEASE_v1/phones/48_39.map')
 
     speech_IDs = []
     with open(sys.argv[1], 'r') as fbank:
@@ -36,7 +37,7 @@ def main():
         for y_ele in y_list:
             if y_ele != current_y_idx:
                 current_y_idx = y_ele
-                trim_y_str += d_phone_alphabet[d_index_phone[y_ele]]
+                trim_y_str += d_phone_alphabet[d_48_39[d_index_phone[y_ele]]]
         trim_y_str = trim_y_str.strip('L')
         all_y.append(trim_y_str)
 
@@ -45,6 +46,14 @@ def main():
         for idx,y in enumerate(all_y):
             str = speech_IDs[idx] + ',' + all_y[idx]
             print >> f, str
+
+def create_48_39_map(path_48_39):
+    d_48_39 = {}
+    with open(path_48_39, 'r') as f:
+        for line in f:
+            tokens = line.strip().split()
+            d_48_39[tokens[0]] = tokens[1]
+    return d_48_39
 
 def smooth(y_list):  
     for i in range(1,len(y_list)-3):
