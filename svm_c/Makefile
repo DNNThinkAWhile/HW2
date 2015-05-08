@@ -14,6 +14,14 @@ LDFLAGS =  $(SFLAGS) -O3 -lm -Wall
 
 all: svm_empty_learn svm_empty_classify
 
+FBANK = MLDS_HW1_RELEASE_v1/fbank
+
+run: 
+	./run_normalize $(FBANK)/train.ark $(FBANK)/train.normalized.ark $(FBANK)/test.ark $(FBANK)/test.normalized.ark
+	./svm_empty_learn -c 20 $(FBANK)/train.normalized.ark m.kaggle
+	./svm_empty_classify $(FBANK)/test.normalized.ark m.kaggle ouput.kaggle.orig
+	python trim.py $(FBANK)/test.normalized.ark output.kaggle.orig output.kaggle 1
+
 .PHONY: clean
 clean: svm_light_clean svm_struct_clean
 	rm -f *.o *.tcov *.d core gmon.out *.stackdump

@@ -14,7 +14,7 @@ def read_examples(filename):
     print 'reading examples from ', filename
 
     d_speechid_index, d_index_phone, d_phone_index, d_phone_alphabet \
-        = feature_vector.read_map('../MLDS_HW1_RELEASE_v1/label/train.lab', '../MLDS_HW1_RELEASE_v1/phones/48_idx_chr.map')
+        = feature_vector.read_map('./MLDS_HW1_RELEASE_v1/label/train.lab', './MLDS_HW1_RELEASE_v1/phones/48_idx_chr.map')
     examples = []
     DUMMY_STR = 'I am dummy yo'
 
