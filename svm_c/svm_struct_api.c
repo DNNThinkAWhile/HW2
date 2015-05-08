@@ -23,7 +23,6 @@
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
 #include "findmost_classify.h"
-#include "viterbi.h"
 #include <Python.h>
 
 #ifndef LENGTH
@@ -312,8 +311,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
     }
   }
   ybar.size = y.size;
-//ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
-  ybar.head = viterbi(sm->w, tmp_x, y.head, y.size);
+  ybar.head = find_most_violated(sm->w, tmp_x, y.head, y.size);
   free(tmp_x);
 
   /* insert your code for computing the label ybar here */

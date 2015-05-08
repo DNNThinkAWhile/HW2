@@ -16,10 +16,12 @@ all: svm_empty_learn svm_empty_classify
 
 FBANK = MLDS_HW1_RELEASE_v1/fbank
 
-run: 
-	./run_normalize $(FBANK)/train.ark $(FBANK)/train.normalized.ark $(FBANK)/test.ark $(FBANK)/test.normalized.ark
+run:
+	wget -O MLDS_HW1_RELEASE_v1.tar.gz https://www.dropbox.com/s/spp3vxh3wa8eru2/MLDS_HW1_RELEASE_v1.tar.gz?dl=0 
+	tar zxvf MLDS_HW1_RELEASE_v1.tar.gz	
+	./run_normalize.sh $(FBANK)/train.ark $(FBANK)/train.normalized.ark $(FBANK)/test.ark $(FBANK)/test.normalized.ark
 	./svm_empty_learn -c 20 $(FBANK)/train.normalized.ark m.kaggle
-	./svm_empty_classify $(FBANK)/test.normalized.ark m.kaggle ouput.kaggle.orig
+	./svm_empty_classify $(FBANK)/test.normalized.ark m.kaggle output.kaggle.orig
 	python trim.py $(FBANK)/test.normalized.ark output.kaggle.orig output.kaggle 1
 
 .PHONY: clean
@@ -85,12 +87,10 @@ svm_empty_classify: svm_light_hideo_noexe svm_struct_noexe svm_struct_api.o svm_
 	$(LD) $(LDFLAGS) $(PYTHON_LD_FLAGS) svm_struct_api.o svm_struct/svm_struct_classify.o svm_light/svm_common.o svm_struct/svm_struct_common.o findmost_classify.o -o svm_empty_classify $(LIBS) -lpthread
 
 svm_empty_learn: svm_light_hideo_noexe svm_struct_noexe svm_struct_api.o svm_struct_learn_custom.o svm_struct/svm_struct_learn.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o findmost_classify.o
-	$(LD) $(LDFLAGS) $(PYTHON_LD_FLAGS) svm_struct/svm_struct_learn.o svm_struct_learn_custom.o svm_struct_api.o svm_light/svm_hideo.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o findmost_classify.o viterbi.o -o svm_empty_learn $(LIBS) -v -lpthread
+	$(LD) $(LDFLAGS) $(PYTHON_LD_FLAGS) svm_struct/svm_struct_learn.o svm_struct_learn_custom.o svm_struct_api.o svm_light/svm_hideo.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o findmost_classify.o -o svm_empty_learn $(LIBS) -v -lpthread
 
 findmost_classify.o: findmost_classify.c findmost_classify.h
 	$(CC) -c $(CFLAGS) findmost_classify.c -o findmost_classify.o
-viterbi.o: viterbi.c viterbi.h
-	$(CC) -c $(CFLAGS) viterbi.c -o viterbi.o -lpthread
 
 svm_struct_api.o: svm_struct_api.c svm_struct_api.h svm_struct_api_types.h svm_struct/svm_struct_common.h
 	$(CC) -c $(CFLAGS) svm_struct_api.c -o svm_struct_api.o $(PYTHON_CC_FLAGS)
